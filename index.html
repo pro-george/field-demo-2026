@@ -1,0 +1,1625 @@
+<!doctype html>
+<html lang="ro">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#1f7a45">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Concept platformă de teren</title>
+<meta name="robots" content="noindex, nofollow, noarchive">
+<meta name="googlebot" content="noindex, nofollow">
+<meta name="description" content="Concept demonstrativ realizat de Pro Creative. Date fictive.">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f3f5f0;--surface:#ffffff;--surface-2:#eef2ea;--text:#132018;--muted:#5b6a60;--line:#dae2d4;
+  --brand:#1f7a45;--brand-2:#2f9a5c;--brand-ink:#ffffff;--brand-soft:#e2f1e7;
+  --warn:#a95a05;--warn-soft:#fdf1df;--danger:#b42318;--danger-soft:#fdecea;--info:#1d5c8c;--info-soft:#e6f0f8;
+  --radius:16px;--shadow:0 1px 2px rgba(19,32,24,.06),0 6px 20px rgba(19,32,24,.06);
+  --mono:'JetBrains Mono',ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#0e1511;--surface:#16201a;--surface-2:#1c2821;--text:#e6efe8;--muted:#9bab9f;--line:#2a3a30;
+    --brand:#3fb26b;--brand-2:#56c47f;--brand-ink:#08140d;--brand-soft:#173323;
+    --warn:#f0a649;--warn-soft:#33240f;--danger:#ff7b6e;--danger-soft:#3a1714;--info:#7cb8e6;--info-soft:#11283a;
+    --shadow:0 1px 2px rgba(0,0,0,.3),0 6px 20px rgba(0,0,0,.25);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0e1511;--surface:#16201a;--surface-2:#1c2821;--text:#e6efe8;--muted:#9bab9f;--line:#2a3a30;
+  --brand:#3fb26b;--brand-2:#56c47f;--brand-ink:#08140d;--brand-soft:#173323;
+  --warn:#f0a649;--warn-soft:#33240f;--danger:#ff7b6e;--danger-soft:#3a1714;--info:#7cb8e6;--info-soft:#11283a;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,-apple-system,Segoe UI,sans-serif;-webkit-font-smoothing:antialiased}
+body{min-height:100vh}
+button,input,select,textarea{font:inherit;color:inherit}
+.shell{max-width:520px;margin:0 auto;min-height:100vh;position:relative}
+.appbar{position:sticky;top:0;z-index:1000;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid var(--line);padding:calc(10px + env(safe-area-inset-top)) 16px 10px;display:flex;align-items:center;gap:10px}
+.mark{width:32px;height:32px;border-radius:9px;background:var(--brand);display:grid;place-items:center;flex:none}
+.mark svg{width:20px;height:20px}
+.wordmark{font-weight:800;letter-spacing:.06em;font-size:14px;line-height:1.1}
+.wordmark small{display:block;font-weight:500;letter-spacing:0;color:var(--muted);font-size:11px}
+.spacer{flex:1}
+.role{display:flex;background:var(--surface-2);border:1px solid var(--line);border-radius:999px;padding:2px}
+.role button{border:0;background:none;padding:5px 10px;border-radius:999px;font-size:12px;font-weight:700;color:var(--muted);cursor:pointer}
+.role button.on{background:var(--surface);color:var(--text);box-shadow:var(--shadow)}
+.pill{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;padding:4px 9px;border-radius:999px;background:var(--surface-2);color:var(--muted);border:1px solid var(--line);white-space:nowrap}
+.pill.ok{background:var(--brand-soft);color:var(--brand);border-color:transparent}
+.pill.warn{background:var(--warn-soft);color:var(--warn);border-color:transparent}
+.pill.danger{background:var(--danger-soft);color:var(--danger);border-color:transparent}
+.pill.info{background:var(--info-soft);color:var(--info);border-color:transparent}
+main{padding:16px 16px calc(100px + env(safe-area-inset-bottom))}
+h1{font-size:24px;margin:4px 0 4px;letter-spacing:-.02em}
+h2{font-size:18px;margin:0 0 6px;letter-spacing:-.01em}
+h3{font-size:15px;margin:0 0 6px}
+p{margin:0 0 10px;line-height:1.5}
+.muted{color:var(--muted)}
+.small{font-size:13px}
+.xs{font-size:11.5px}
+.b{font-weight:700}
+.sec{font-size:12px;font-weight:700;letter-spacing:.05em;color:var(--muted);margin:18px 2px 8px;text-transform:uppercase}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:14px;box-shadow:var(--shadow);margin-bottom:12px}
+.card.flat{box-shadow:none}
+.card.danger{background:var(--danger-soft);border-color:transparent}
+.card.warn{background:var(--warn-soft);border-color:transparent}
+.card.ok{background:var(--brand-soft);border-color:transparent}
+.card.info{background:var(--info-soft);border-color:transparent}
+.row{display:flex;gap:10px;align-items:center}
+.row.top{align-items:flex-start}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.btn{appearance:none;border:1px solid var(--line);background:var(--surface);border-radius:12px;padding:11px 14px;font-weight:600;font-size:14px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:8px;text-decoration:none;color:var(--text);text-align:center}
+.btn:active{transform:translateY(1px)}
+.btn.primary{background:var(--brand);color:var(--brand-ink);border-color:var(--brand)}
+.btn.danger{background:var(--danger);color:#fff;border-color:var(--danger)}
+.btn.ghost{background:transparent}
+.btn.block{width:100%}
+.btn.sm{padding:7px 10px;font-size:13px;border-radius:10px}
+.btn[disabled]{opacity:.45;pointer-events:none}
+.ico{width:20px;height:20px;flex:none}
+.tbadge{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;flex:none;color:#fff}
+.tbadge svg{width:19px;height:19px}
+.hero{margin:4px 0 14px}
+.tile{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px;box-shadow:var(--shadow);cursor:pointer;text-align:left}
+.tile .n{font-size:26px;font-weight:800;letter-spacing:-.02em;line-height:1.1}
+.tile .l{font-size:12px;color:var(--muted);font-weight:600;margin-top:2px;line-height:1.3}
+.tile.danger .n{color:var(--danger)}
+.tile.warn .n{color:var(--warn)}
+.tile.info .n{color:var(--info)}
+.tile.ok .n{color:var(--brand)}
+.item{display:flex;gap:12px;align-items:center;padding:12px 0;border-top:1px solid var(--line);cursor:pointer;width:100%;background:none;border-left:0;border-right:0;border-bottom:0;text-align:left}
+.item:first-child{border-top:0}
+.item .t{font-weight:600;font-size:14px;line-height:1.3}
+.case .top{display:flex;justify-content:space-between;gap:8px;align-items:flex-start}
+.code{font-family:var(--mono);font-size:12px;color:var(--muted)}
+.progress{display:flex;gap:4px;margin-top:10px}
+.progress i{flex:1;height:4px;border-radius:4px;background:var(--line)}
+.progress i.on{background:var(--brand)}
+.chips{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin:0 -16px 12px;padding:0 16px}
+.chips.wrap{flex-wrap:wrap;overflow:visible;margin:0;padding:0}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:none;padding:6px 11px;border-radius:999px;border:1px solid var(--line);background:var(--surface);font-size:12.5px;font-weight:600;cursor:pointer;color:var(--muted)}
+.chip.on{background:var(--text);color:var(--bg);border-color:var(--text)}
+.stepper{display:flex;gap:6px;margin:6px -16px 14px;padding:0 16px;overflow-x:auto;scrollbar-width:none}
+.stepper::-webkit-scrollbar{display:none}
+.step{flex:none;display:flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;border:1px solid var(--line);background:var(--surface);font-size:12.5px;font-weight:600;color:var(--muted);cursor:pointer}
+.step b{width:18px;height:18px;border-radius:50%;display:grid;place-items:center;font-size:11px;background:var(--surface-2)}
+.step.cur{border-color:var(--brand);color:var(--text)}
+.step.cur b{background:var(--brand);color:var(--brand-ink)}
+.step.done b{background:var(--brand-soft);color:var(--brand)}
+.backrow{display:flex;align-items:center;gap:8px;margin-bottom:4px}
+.ev{display:flex;gap:10px;align-items:center;padding:10px 0;border-top:1px solid var(--line)}
+.ev:first-child{border-top:0}
+.thumb{width:56px;height:56px;border-radius:10px;background:var(--surface-2);flex:none;display:grid;place-items:center;overflow:hidden}
+.thumb img{width:100%;height:100%;object-fit:cover}
+.hash{font-family:var(--mono);font-size:11px;color:var(--muted);word-break:break-all}
+label.f{display:block;font-size:12.5px;font-weight:600;color:var(--muted);margin:10px 0 5px}
+input.in,select.in,textarea.in{width:100%;padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:var(--surface);font-size:15px}
+textarea.in{min-height:84px;resize:vertical}
+input.in:focus,select.in:focus,textarea.in:focus{outline:2px solid color-mix(in srgb,var(--brand) 40%,transparent);border-color:var(--brand)}
+.metric{font-size:26px;font-weight:800;letter-spacing:-.02em;line-height:1.15}
+.metric small{font-size:13px;font-weight:600;color:var(--muted);margin-left:4px}
+.mapbox{height:330px;border-radius:var(--radius);overflow:hidden;border:1px solid var(--line);margin-bottom:12px;z-index:1}
+.leaflet-container{background:var(--surface-2);font-family:inherit}
+.ba{position:relative;border-radius:var(--radius);overflow:hidden;aspect-ratio:1/1;background:var(--surface-2);border:1px solid var(--line)}
+.ba img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.ba .after{position:absolute;inset:0;clip-path:inset(0 0 0 50%)}
+.ba .tag{position:absolute;top:8px;font-size:11px;font-weight:700;padding:3px 8px;border-radius:6px;background:rgba(0,0,0,.6);color:#fff}
+.ba .divider{position:absolute;top:0;bottom:0;width:2px;background:#fff;box-shadow:0 0 0 1px rgba(0,0,0,.2)}
+input[type=range]{width:100%;accent-color:var(--brand)}
+.seg{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:12px}
+.seg.s4{grid-template-columns:repeat(4,1fr)}
+.seg.s3{grid-template-columns:repeat(3,1fr)}
+.seg button{padding:9px 8px;border-radius:10px;border:1px solid var(--line);background:var(--surface);font-weight:600;font-size:13px;cursor:pointer;text-align:left}
+.seg.s4 button,.seg.s3 button{text-align:center;padding:8px 4px;font-size:12.5px}
+.seg button.on{border-color:var(--brand);background:var(--brand-soft)}
+.tgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.tpick{display:flex;gap:10px;align-items:center;padding:12px;border-radius:14px;border:1px solid var(--line);background:var(--surface);cursor:pointer;text-align:left;font-weight:600;font-size:13.5px;line-height:1.25}
+.tpick.on{border-color:var(--brand);background:var(--brand-soft)}
+.doc{background:#fff;color:#111;border-radius:12px;padding:20px 18px;font-family:'Times New Roman',Georgia,serif;font-size:13.5px;line-height:1.5;border:1px solid var(--line);max-height:520px;overflow:auto}
+.doc h4{text-align:center;margin:14px 0 2px;font-size:16px;letter-spacing:.04em}
+.doc .sub{text-align:center;margin:0 0 14px;font-style:italic}
+.doc table{width:100%;border-collapse:collapse;font-size:11.5px;margin:6px 0 10px}
+.doc td,.doc th{border:1px solid #bbb;padding:4px 5px;vertical-align:top;text-align:left}
+.doc .hx{font-family:'JetBrains Mono',monospace;font-size:9.5px;word-break:break-all}
+.doc .lh{display:flex;justify-content:space-between;border-bottom:2px solid #1f7a45;padding-bottom:6px;margin-bottom:8px;font-family:Inter,Arial,sans-serif}
+.doc .lh b{color:#1f7a45;letter-spacing:.08em}
+.doc .foot{margin-top:18px;border-top:1px solid #ccc;padding-top:6px;font-size:10.5px;color:#555;font-family:Inter,Arial,sans-serif}
+.doc .kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;font-family:Inter,Arial,sans-serif;margin:10px 0}
+.doc .kpis div{border:1px solid #cfd8cc;border-radius:8px;padding:8px;font-size:11.5px}
+.doc .kpis b{display:block;font-size:19px;color:#1f7a45}
+.doc .todo{background:#fff4d6;padding:0 3px}
+.log{font-family:var(--mono);font-size:11px;color:var(--muted);max-height:160px;overflow:auto}
+.log div{padding:3px 0;border-top:1px dashed var(--line)}
+.log div:first-child{border-top:0}
+.chart{width:100%;height:auto;display:block}
+.gen{white-space:pre-wrap;font-size:13.5px;line-height:1.5;background:var(--surface-2);border-radius:10px;padding:12px;max-height:260px;overflow:auto;margin:8px 0}
+.bar{height:8px;border-radius:8px;background:var(--surface-2);overflow:hidden}
+.bar i{display:block;height:100%;background:var(--brand);border-radius:8px}
+.stack{display:flex;height:14px;border-radius:7px;overflow:hidden;background:var(--surface-2);margin:8px 0}
+.stack i{display:block;height:100%}
+.clocks{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.clock{border-radius:14px;padding:12px;border:1px solid var(--line);background:var(--surface)}
+.clock .k{font-size:11px;font-weight:700;letter-spacing:.05em;color:var(--muted)}
+.clock .v{font-size:19px;font-weight:800;letter-spacing:-.01em;margin:4px 0 2px;line-height:1.2}
+.tl{position:relative;margin:8px 0 4px 6px;padding-left:16px;border-left:2px solid var(--line)}
+.tl .e{position:relative;padding:0 0 12px}
+.tl .e::before{content:"";position:absolute;left:-22px;top:4px;width:10px;height:10px;border-radius:50%;background:var(--surface);border:2px solid var(--brand)}
+.tl .e.fut::before{border-style:dashed;border-color:var(--info)}
+.tl .e.bad::before{border-color:var(--danger)}
+.tl .e.win::before{background:var(--brand)}
+.tl .e .d{font-size:11.5px;color:var(--muted);font-weight:600}
+.tl .e .t{font-size:13.5px;font-weight:600;line-height:1.35}
+.tl .gap{font-size:11.5px;font-weight:700;color:var(--warn);background:var(--warn-soft);border-radius:8px;padding:4px 8px;margin:0 0 12px -4px;display:inline-block}
+details.add{margin-top:6px}
+details.add summary{cursor:pointer;font-weight:600;font-size:13px;color:var(--brand);list-style:none}
+details.add summary::-webkit-details-marker{display:none}
+.legend{display:flex;flex-wrap:wrap;gap:10px;font-size:12px;color:var(--muted);margin:-4px 0 12px}
+.legend span{display:inline-flex;align-items:center;gap:5px}
+.legend i{width:12px;height:12px;border-radius:3px;display:inline-block}
+.taglist{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.taglist span{font-size:12px;padding:4px 8px;border-radius:8px;background:var(--surface);border:1px solid var(--line)}
+.public{border-radius:var(--radius);overflow:hidden;border:1px solid var(--line);background:var(--surface);margin-bottom:12px}
+.public .head{background:linear-gradient(160deg,#123d26,#1f7a45 70%,#2f9a5c);color:#fff;padding:22px 18px}
+.public .head h2{color:#fff;font-size:21px;line-height:1.25}
+.public .big{font-size:36px;font-weight:800;letter-spacing:-.03em;line-height:1}
+.amts{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:10px 0}
+.amts button{padding:9px 4px;border-radius:10px;border:1px solid var(--line);background:var(--surface);font-weight:700;cursor:pointer}
+.amts button.on{background:var(--brand);color:var(--brand-ink);border-color:var(--brand)}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;font-size:13.5px}
+.kv dt{color:var(--muted)}
+.kv dd{margin:0;font-weight:600}
+.check{display:flex;gap:10px;align-items:flex-start;font-size:14px;line-height:1.4;cursor:pointer}
+.check input{width:20px;height:20px;accent-color:var(--brand);margin-top:1px;flex:none}
+.tabbar{position:fixed;left:0;right:0;bottom:0;z-index:1000;background:var(--surface);border-top:1px solid var(--line);padding:8px 10px calc(8px + env(safe-area-inset-bottom))}
+.tabbar .in{max-width:520px;margin:0 auto;display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:4px}
+.tab{background:none;border:0;padding:6px 2px;border-radius:10px;font-size:11px;font-weight:600;color:var(--muted);display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;position:relative}
+.tab svg{width:22px;height:22px}
+.tab.on{color:var(--brand)}
+.tab .dot{position:absolute;top:2px;right:calc(50% - 18px);min-width:16px;height:16px;border-radius:8px;background:var(--danger);color:#fff;font-size:10px;display:grid;place-items:center;padding:0 4px}
+.tab.plus span.c{width:42px;height:42px;border-radius:14px;background:var(--brand);color:var(--brand-ink);display:grid;place-items:center;margin-top:-14px;box-shadow:var(--shadow)}
+.toast{position:fixed;left:50%;bottom:calc(90px + env(safe-area-inset-bottom));transform:translateX(-50%) translateY(20px);background:var(--text);color:var(--bg);padding:10px 14px;border-radius:12px;font-size:13.5px;font-weight:600;opacity:0;transition:.25s;z-index:2000;max-width:90vw;pointer-events:none}
+.toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+.navrow{display:flex;gap:10px;margin-top:6px}
+.navrow .btn{flex:1}
+.demobar{position:sticky;top:57px;z-index:999;display:flex;align-items:center;gap:8px;padding:7px 16px;background:var(--warn-soft);color:var(--warn);font-size:12px;font-weight:600;border-bottom:1px solid var(--line)}
+.demobar button{margin-left:auto;background:none;border:0;color:inherit;font:inherit;text-decoration:underline;cursor:pointer;padding:0}
+.intro{position:fixed;inset:0;z-index:3000;background:rgba(10,20,14,.55);display:none;align-items:flex-end;justify-content:center;padding:16px}
+.intro.on{display:flex}
+.intro .box{background:var(--surface);color:var(--text);border-radius:20px;max-width:480px;width:100%;max-height:calc(100vh - 32px);overflow:auto;padding:22px 20px 18px;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+.intro .kicker{font-size:11px;font-weight:800;letter-spacing:.08em;color:var(--brand)}
+.intro h2{font-size:21px;margin:6px 0 10px;line-height:1.25}
+.intro ul{margin:0 0 12px;padding-left:18px;font-size:14px;line-height:1.5}
+.intro li{margin-bottom:6px}
+.intro .tour{background:var(--surface-2);border-radius:12px;padding:12px;font-size:13.5px;line-height:1.5;margin-bottom:14px}
+.intro .tour ol{margin:6px 0 0;padding-left:18px}
+@media (min-width:600px){.intro{align-items:center}}
+#print{display:none}
+@media print{
+  body{background:#fff}
+  .shell,.tabbar,.toast{display:none!important}
+  #print{display:block}
+  #print .doc{max-height:none;border:0;padding:0;overflow:visible;font-size:12.5px}
+  @page{margin:18mm 16mm}
+}
+</style>
+</head>
+<body>
+<div class="shell">
+  <header class="appbar">
+    <div class="mark" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none"><path d="M5 19c0-8 5-13 14-14-.5 9-5.5 14-13 14H5z" fill="#fff"/><path d="M5 19c3-4 6-7 10-9" stroke="#1f7a45" stroke-width="1.6" stroke-linecap="round"/></svg>
+    </div>
+    <div class="wordmark">AGENT GREEN<small id="subtitle">Platforma de protecție a naturii</small></div>
+    <div class="spacer"></div>
+    <div class="role" aria-label="Mod">
+      <button data-act="role" data-r="team" id="r-team">Echipă</button>
+      <button data-act="role" data-r="vol" id="r-vol">Voluntar</button>
+    </div>
+  </header>
+  <div class="demobar" role="note">Concept Pro Creative · date fictive<button data-intro="open">Despre demo</button></div>
+  <main id="app"></main>
+</div>
+<nav class="tabbar"><div class="in" id="tabs"></div></nav>
+<div class="toast" id="toast"></div>
+<div class="intro" id="intro" role="dialog" aria-modal="true" aria-labelledby="intro-t">
+  <div class="box">
+    <div class="kicker">CONCEPT · PRO CREATIVE</div>
+    <h2 id="intro-t">Platformă de teren, juridică și de campanie pentru Agent Green</h2>
+    <ul>
+      <li><b>Este un concept demonstrativ</b>, realizat de Pro Creative ca propunere. Nu este un produs oficial al Asociației Agent Green.</li>
+      <li><b>Toate cazurile, persoanele, numerele de dosar, cifrele și statisticile despre instituții sunt fictive.</b> Nu descriu situații sau instituții reale.</li>
+      <li>Termenele legale sunt implementate după textul legii și urmează să fie validate cu un jurist.</li>
+      <li>Ce introduci rămâne doar pe acest dispozitiv. Butonul „Resetează datele demo” readuce totul la început.</li>
+    </ul>
+    <div class="tour"><b>Un traseu de 3 minute</b>
+      <ol>
+        <li><b>Acasă</b>: termenele care pot pierde un caz, primele.</li>
+        <li>Deschide cazul cu <b>plângerea împotriva clasării</b> și apasă „Pregătește documentul”.</li>
+        <li>Comută pe <b>Voluntar</b> (sus) și trimite o raportare, apoi revino pe <b>Echipă</b> → Raportări.</li>
+        <li><b>Impact</b>: cele două ceasuri, instituțiile și pagina pentru donatori.</li>
+      </ol>
+      <div class="muted xs" style="margin-top:6px">Pe telefon, camera și GPS-ul funcționează real.</div>
+    </div>
+    <button class="btn primary block" data-intro="close">Am înțeles, intră în demo</button>
+  </div>
+</div>
+<div id="print"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script>
+/* ==================================================================
+   Agent Green — Platforma de protecție a naturii · v3 (concept, Pro Creative)
+   Model realist: două ceasuri (teren / juridic), termene procedurale,
+   prescripție, dosare de ani de zile, statistici instituționale,
+   campaniile reale Agent Green, rapoarte pentru donatori și parteneri.
+   Termenele legale sunt implementate după textul legii și trebuie
+   validate cu un jurist. Datele de exemplu sunt demonstrative.
+   ================================================================== */
+const $ = (s, r = document) => r.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const DAY = 864e5, YEAR = 365.25 * DAY;
+const now = () => Date.now();
+const fmtDT = ts => new Date(ts).toLocaleString('ro-RO', {day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'});
+const fmtD = ts => new Date(ts).toLocaleDateString('ro-RO', {day:'2-digit',month:'long',year:'numeric'});
+const fmtDs = ts => new Date(ts).toLocaleDateString('ro-RO');
+const fmtMY = ts => new Date(ts).toLocaleDateString('ro-RO', {month:'long',year:'numeric'});
+const fx = (n, d = 5) => Number(n).toFixed(d);
+const f1 = n => (Math.round(n * 10) / 10).toFixed(1).replace('.', ',');
+const lei = n => Math.round(n).toLocaleString('ro-RO') + ' lei';
+function fmtDur(ms){
+  ms = Math.max(0, ms); const m = Math.floor(ms / (30.44 * DAY)); const y = Math.floor(m / 12), mm = m % 12;
+  if (y && mm) return `${y} ${y === 1 ? 'an' : 'ani'} și ${mm} ${mm === 1 ? 'lună' : 'luni'}`;
+  if (y) return `${y} ${y === 1 ? 'an' : 'ani'}`;
+  if (m) return `${m} ${m === 1 ? 'lună' : 'luni'}`;
+  const d = Math.round(ms / DAY); return `${d} ${d === 1 ? 'zi' : 'zile'}`;
+}
+const ago = ts => { const m = Math.round((now() - ts) / 6e4); if (m < 60) return `acum ${Math.max(1, m)} min`; const h = Math.round(m / 60); if (h < 24) return `acum ${h} h`; const d = Math.round(h / 24); return d === 1 ? 'ieri' : d < 60 ? `acum ${d} zile` : 'acum ' + fmtDur(now() - ts); };
+const zile = n => `${n} ${Math.abs(n) === 1 ? 'zi' : 'zile'}`;
+const STORE = 'agplatforma.v3';
+const STEPS = ['Probe', 'Zonă', 'Analiză', 'Verificări', 'Documente', 'Dosar juridic', 'Campanie'];
+
+/* ---------- SHA-256 ---------- */
+function sha256js(bytes){
+  const rr = (v, a) => (v >>> a) | (v << (32 - a));
+  const H = [], K = []; let pc = 0; const comp = {};
+  for (let c = 2; pc < 64; c++) { if (!comp[c]) { for (let i = 0; i < 313; i += c) comp[i] = c; H[pc] = (Math.pow(c, .5) * 4294967296) | 0; K[pc++] = (Math.pow(c, 1/3) * 4294967296) | 0; } }
+  const l = bytes.length, total = Math.ceil((l + 9) / 64) * 64;
+  const m = new Uint8Array(total); m.set(bytes); m[l] = 0x80;
+  const dv = new DataView(m.buffer);
+  dv.setUint32(total - 4, (l * 8) >>> 0); dv.setUint32(total - 8, Math.floor(l * 8 / 4294967296));
+  let h = H.slice(0, 8); const w = new Array(64);
+  for (let j = 0; j < total; j += 64) {
+    for (let i = 0; i < 16; i++) w[i] = dv.getUint32(j + i * 4) | 0;
+    for (let i = 16; i < 64; i++) { const a = w[i-15], b = w[i-2]; w[i] = (w[i-16] + (rr(a,7) ^ rr(a,18) ^ (a >>> 3)) + w[i-7] + (rr(b,17) ^ rr(b,19) ^ (b >>> 10))) | 0; }
+    let [a,b,c,d,e,f,g,hh] = h;
+    for (let i = 0; i < 64; i++) {
+      const t1 = (hh + (rr(e,6) ^ rr(e,11) ^ rr(e,25)) + ((e & f) ^ (~e & g)) + K[i] + w[i]) | 0;
+      const t2 = ((rr(a,2) ^ rr(a,13) ^ rr(a,22)) + ((a & b) ^ (a & c) ^ (b & c))) | 0;
+      hh = g; g = f; f = e; e = (d + t1) | 0; d = c; c = b; b = a; a = (t1 + t2) | 0;
+    }
+    h = [h[0]+a, h[1]+b, h[2]+c, h[3]+d, h[4]+e, h[5]+f, h[6]+g, h[7]+hh].map(x => x | 0);
+  }
+  return h.map(x => (x >>> 0).toString(16).padStart(8, '0')).join('');
+}
+async function sha256(input){
+  const bytes = typeof input === 'string' ? new TextEncoder().encode(input) : new Uint8Array(input);
+  try { if (window.crypto && crypto.subtle) { const buf = await crypto.subtle.digest('SHA-256', bytes); return [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2, '0')).join(''); } } catch (e) {}
+  return sha256js(bytes);
+}
+
+/* ---------- Iconuri ---------- */
+const ICON = {
+  tree:'<path d="M12 3 6 11h3l-4 6h14l-4-6h3z"/><path d="M12 17v4"/>',
+  target:'<circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4"/>',
+  build:'<path d="M3 21h18M5 21V10l7-6 7 6v11"/><path d="M9 21v-5h6v5"/>',
+  water:'<path d="M2 8c2.5-2 4.5-2 7 0s4.5 2 7 0 4.5-2 6 0M2 14c2.5-2 4.5-2 7 0s4.5 2 7 0 4.5-2 6 0M2 20c2.5-2 4.5-2 7 0s4.5 2 7 0 4.5-2 6 0"/>',
+  trash:'<path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/><path d="M10 11v6M14 11v6"/>',
+  alert:'<path d="M12 3 2 20h20z"/><path d="M12 10v4M12 17v.5"/>',
+  scroll:'<path d="M8 3h11v14a3 3 0 0 1-3 3H6a3 3 0 0 1-3-3v-2h11v2a3 3 0 0 0 3 3"/><path d="M8 3a3 3 0 0 0-3 3v9M11 8h5M11 12h5"/>',
+  home:'<path d="M3 11 12 4l9 7"/><path d="M5 10v10h14V10"/>',
+  list:'<path d="M4 6h16M4 12h16M4 18h10"/>',
+  plus:'<path d="M12 5v14M5 12h14"/>',
+  inbox:'<path d="M3 13h5l2 3h4l2-3h5"/><path d="M5 5h14l2 8v6H3v-6z"/>',
+  map:'<path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2z"/><path d="M9 4v14M15 6v14"/>',
+  camera:'<path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/>',
+  shield:'<path d="M12 3 4 6v6c0 4.5 3.4 8.4 8 9 4.6-.6 8-4.5 8-9V6z"/><path d="m9 12 2 2 4-4"/>',
+  clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+  hourglass:'<path d="M6 3h12M6 21h12M7 3c0 5 10 5 10 9s-10 4-10 9M17 3c0 5-10 5-10 9s10 4 10 9"/>',
+  scale:'<path d="M12 3v18M5 21h14M6 7h12M6 7l-3 7a3 3 0 0 0 6 0zM18 7l-3 7a3 3 0 0 0 6 0z"/>',
+  mega:'<path d="M3 11v2a1 1 0 0 0 1 1h2l5 4V6L6 10H4a1 1 0 0 0-1 1z"/><path d="M15 9a4 4 0 0 1 0 6M18 6a8 8 0 0 1 0 12"/>',
+  user:'<circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/>',
+  truck:'<path d="M3 7h11v9H3zM14 10h4l3 3v3h-7"/><circle cx="7" cy="17" r="1.8"/><circle cx="17" cy="17" r="1.8"/>',
+  film:'<rect x="3" y="5" width="18" height="14" rx="2"/><path d="M7 5v14M17 5v14M3 9h4M3 15h4M17 9h4M17 15h4"/>',
+  doc:'<path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4M9 12h6M9 16h6"/>',
+  heart:'<path d="M12 20s-7-4.5-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.5-7 10-7 10z"/>',
+  handshake:'<path d="m11 17 2 2a1 1 0 0 0 3-3"/><path d="m14 14 2.5 2.5a1 1 0 0 0 3-3l-3.9-3.9a2 2 0 0 0-2.8 0L11 11.5a1 1 0 0 1-3-3L11 5.6a2 2 0 0 1 2.8 0L15 7h4l2 2v4M3 13l5 5M3 7l3-1 4 1"/>',
+  upload:'<path d="M12 16V4M7 9l5-5 5 5"/><path d="M4 16v4h16v-4"/>',
+  bldg:'<path d="M3 21h18M5 21V8l7-4 7 4v13"/><path d="M9 21v-6h6v6M9 10h.01M15 10h.01"/>'
+};
+const svg = (k, cls = 'ico', sw = 1.8) => `<svg class="${cls}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round">${ICON[k] || ''}</svg>`;
+
+/* ---------- Arii protejate: demo aproximativ + import date Agent Green ---------- */
+const DEMO_ZONES = [
+  { id:'pnr', level:'park', name:'Parcul Național Retezat', color:'#e0a100',
+    regime:'Parc național și sit Natura 2000. Intervențiile sunt strict limitate prin planul de management; exploatarea comercială și lucrările de construcție nu sunt compatibile cu statutul de parc național.',
+    poly:[[45.468,22.80],[45.455,22.93],[45.43,23.02],[45.38,23.05],[45.33,23.00],[45.29,22.93],[45.26,22.82],[45.27,22.70],[45.31,22.63],[45.37,22.62],[45.42,22.68],[45.455,22.73]] },
+  { id:'gem', level:'strict', name:'Zona de protecție strictă Gemenele – Tăul Negru', color:'#d92d20',
+    regime:'Zonă de protecție strictă: orice activitate de exploatare, vânătoare sau construcție este interzisă.',
+    poly:[[45.40,22.84],[45.395,22.93],[45.36,22.95],[45.335,22.90],[45.34,22.83],[45.37,22.80]] },
+  { id:'rs', level:'strict', name:'Valea Râu-Șes – protecție strictă', color:'#d92d20',
+    regime:'Zonă strict protejată: orice activitate de exploatare, vânătoare sau construcție este interzisă.',
+    poly:[[45.362,22.700],[45.362,22.780],[45.322,22.790],[45.315,22.712]] }
+];
+const VALUES = {
+  pnr:{ score:'Foarte ridicată', habitats:['9410 – Păduri acidofile de molid','91V0 – Păduri dacice de fag','6150 – Pajiști alpine pe substrat silicios'],
+        species:['Urs brun (Ursus arctos)','Lup (Canis lupus)','Râs (Lynx lynx)','Capră neagră (Rupicapra rupicapra)','Cocoș de munte (Tetrao urogallus)'] },
+  gem:{ score:'Excepțională', extra:['Păduri potențial virgine, neintervenite','Zonă de liniște pentru faună mare'] },
+  rs:{ score:'Excepțională', extra:['Pădure naturală de molid, strict protejată','Coridor ecologic pentru urs și lup'] }
+};
+const DEMO_POINT = { lat:45.3405, lng:22.7465 };
+let CUSTOM = null; // {file, zones:[{name, level, bbox, rings}]}
+function pip(pt, poly){
+  let inside = false; const [y, x] = pt;
+  for (let i = 0, j = poly.length - 1; i < poly.length; j = i++) { const [yi, xi] = poly[i], [yj, xj] = poly[j]; if (((yi > y) !== (yj > y)) && (x < (xj - xi) * (y - yi) / (yj - yi) + xi)) inside = !inside; }
+  return inside;
+}
+function levelFromName(n){
+  if (/rezerva[tț]i[ae] [sș]tiin[tț]ific|protec[tț]ie strict|integral/i.test(n)) return 'strict';
+  if (/parc(ul)? na[tț]ional|national park/i.test(n)) return 'park';
+  if (/parc(ul)? natural|geoparc|rezerva[tț]i/i.test(n)) return 'park';
+  if (/^RO(SCI|SPA|SAC)|natura ?2000/i.test(n)) return 'n2k';
+  return 'arie';
+}
+function evalZone(lat, lng){
+  if (CUSTOM) {
+    const hits = CUSTOM.zones.filter(z => lat >= z.bbox[0] && lat <= z.bbox[2] && lng >= z.bbox[1] && lng <= z.bbox[3] && z.rings.some(r => pip([lat, lng], r)));
+    if (hits.length) {
+      const rank = { strict:3, park:2, n2k:1, arie:0 }; hits.sort((a, b) => rank[b.level] - rank[a.level]);
+      const top = hits[0];
+      const regime = top.level === 'strict' ? 'Zonă de protecție strictă: orice activitate de exploatare, vânătoare sau construcție este interzisă.' : top.level === 'park' ? 'Arie naturală protejată de interes național. Regimul exact al zonei rezultă din planul de management.' : 'Sit Natura 2000: orice plan sau proiect cu impact semnificativ necesită evaluare adecvată.';
+      return { level: top.level === 'n2k' || top.level === 'arie' ? 'park' : top.level, name: top.name, park: hits.filter(h => h !== top).map(h => h.name).join(', '), regime, ids: [], src:'agentgreen', all: hits.map(h => h.name) };
+    }
+    return { level:'none', name:'În afara ariilor protejate (date Agent Green)', park:'', regime:'Punctul nu se află în nicio arie protejată din setul de date încărcat.', ids:[], src:'agentgreen', all:[] };
+  }
+  const hits = DEMO_ZONES.filter(z => pip([lat, lng], z.poly));
+  const strict = hits.find(z => z.level === 'strict'), park = hits.find(z => z.level === 'park');
+  const ids = hits.map(z => z.id);
+  if (strict) return { level:'strict', name:strict.name, park:park ? park.name : '', regime:strict.regime, ids, src:'demo' };
+  if (park) return { level:'park', name:park.name, park:park.name, regime:park.regime, ids, src:'demo' };
+  return { level:'none', name:'În afara ariilor încărcate în demo', park:'', regime:'Nu s-a identificat o arie protejată în straturile demo.', ids, src:'demo' };
+}
+function valueOf(z){
+  if (!z) return null;
+  const retezat = (z.ids && z.ids.length) || /retezat/i.test((z.name || '') + (z.park || ''));
+  if (!retezat) return null;
+  const base = VALUES.pnr, strict = (z.ids || []).map(i => VALUES[i]).find(v => v && v.extra);
+  return { score: strict ? strict.score : (z.level === 'strict' ? 'Excepțională' : base.score), habitats: base.habitats, species: base.species, extra: strict ? strict.extra : [] };
+}
+function dist(a, b){
+  const R = 6371, dLat = (b.lat - a.lat) * Math.PI / 180, dLng = (b.lng - a.lng) * Math.PI / 180;
+  const s = Math.sin(dLat / 2) ** 2 + Math.cos(a.lat * Math.PI / 180) * Math.cos(b.lat * Math.PI / 180) * Math.sin(dLng / 2) ** 2;
+  return 2 * R * Math.asin(Math.sqrt(s));
+}
+function loadScript(src){ return new Promise((res, rej) => { if (document.querySelector(`script[src="${src}"]`)) return res(); const s = document.createElement('script'); s.src = src; s.onload = res; s.onerror = () => rej(new Error('Nu am putut încărca ' + src)); document.head.appendChild(s); }); }
+function kmlToFeatures(text){
+  const doc = new DOMParser().parseFromString(text, 'text/xml');
+  const out = [];
+  doc.querySelectorAll('Placemark').forEach(pm => {
+    let name = (pm.querySelector('name')?.textContent || '').trim();
+    if (!name) { const d = pm.querySelector('SimpleData[name="NUME"], SimpleData[name="Name"], SimpleData[name="DENUMIRE"], SimpleData[name="nume"], Data[name="NUME"] value'); name = (d?.textContent || 'Arie protejată').trim(); }
+    const rings = [...pm.querySelectorAll('Polygon outerBoundaryIs coordinates')].map(c => c.textContent.trim().split(/\s+/).map(t => { const [x, y] = t.split(',').map(Number); return [y, x]; }).filter(p => !isNaN(p[0])));
+    if (rings.length) out.push({ name, rings });
+  });
+  return out;
+}
+function geojsonToFeatures(gj){
+  const feats = (gj.features || (Array.isArray(gj) ? gj.flatMap(g => g.features || []) : []));
+  return feats.map(f => {
+    const p = f.properties || {}; const name = p.NUME || p.Nume || p.nume || p.DENUMIRE || p.Denumire || p.NAME || p.Name || p.name || p.SITENAME || p.SITECODE || 'Arie protejată';
+    const g = f.geometry || {}; const polys = g.type === 'Polygon' ? [g.coordinates] : g.type === 'MultiPolygon' ? g.coordinates : [];
+    return { name: String(name), rings: polys.map(pl => pl[0].map(([x, y]) => [y, x])) };
+  }).filter(f => f.rings.length);
+}
+async function importBoundaries(file){
+  const ext = file.name.toLowerCase().split('.').pop();
+  let feats = [];
+  if (ext === 'geojson' || ext === 'json') feats = geojsonToFeatures(JSON.parse(await file.text()));
+  else if (ext === 'kml') feats = kmlToFeatures(await file.text());
+  else if (ext === 'kmz') {
+    await loadScript('https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js');
+    const z = await JSZip.loadAsync(file); const k = Object.values(z.files).find(x => x.name.toLowerCase().endsWith('.kml'));
+    if (!k) throw new Error('Arhiva KMZ nu conține un fișier KML'); feats = kmlToFeatures(await k.async('string'));
+  } else if (ext === 'zip') {
+    await loadScript('https://unpkg.com/shpjs@4.0.4/dist/shp.js');
+    feats = geojsonToFeatures(await shp(await file.arrayBuffer()));
+  } else throw new Error('Format nesuportat. Folosește KMZ, KML, GeoJSON sau SHP arhivat (.zip).');
+  const zones = feats.map(f => { let a = 90, b = 180, c = -90, d = -180; f.rings.forEach(r => r.forEach(([y, x]) => { a = Math.min(a, y); b = Math.min(b, x); c = Math.max(c, y); d = Math.max(d, x); })); return { name:f.name, level:levelFromName(f.name + ' ' + file.name), bbox:[a, b, c, d], rings:f.rings }; });
+  if (!zones.length) throw new Error('Nu am găsit poligoane în fișier.');
+  const prev = CUSTOM ? CUSTOM.zones : [];
+  CUSTOM = { files: [...(CUSTOM ? CUSTOM.files : []), file.name], zones: [...prev, ...zones] };
+  return zones.length;
+}
+
+/* ---------- Utilitare ---------- */
+function seeded(a, b){ let s = Math.abs(Math.sin(a * 12.9898 + b * 78.233) * 43758.5453); return s - Math.floor(s); }
+function volumeEstimate(n, dcm){ n = +n || 0; dcm = +dcm || 0; return n * Math.PI / 4 * Math.pow(dcm / 100, 2) * 25 * 0.45; }
+function tileFor(lat, lng, z){ const n = 2 ** z, r = lat * Math.PI / 180; return { z, x: Math.floor((lng + 180) / 360 * n), y: Math.floor((1 - Math.log(Math.tan(r) + 1 / Math.cos(r)) / Math.PI) / 2 * n) }; }
+function toast(msg){ const t = $('#toast'); t.textContent = msg; t.classList.add('on'); clearTimeout(toast._t); toast._t = setTimeout(() => t.classList.remove('on'), 2600); }
+function uid(){ return Date.now().toString(36) + Math.random().toString(36).slice(2, 7); }
+function download(name, text, type){ const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([text], { type })); a.download = name; document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 500); }
+function printHTML(html){ $('#print').innerHTML = `<div class="doc">${html}</div>`; setTimeout(() => window.print(), 60); }
+async function copyText(txt){
+  try { await navigator.clipboard.writeText(txt); toast('Copiat'); }
+  catch (e) { const ta = document.createElement('textarea'); ta.value = txt; document.body.appendChild(ta); ta.select(); try { document.execCommand('copy'); toast('Copiat'); } catch (_) { toast('Copierea nu e permisă aici'); } ta.remove(); }
+}
+function dateInputVal(ts){ const d = new Date(ts); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; }
+function fromDateInput(v){ if (!v) return now(); const [y, m, d] = v.split('-').map(Number); return new Date(y, m - 1, d, 12).getTime(); }
+
+/* ---------- Campaniile reale Agent Green (agentgreen.ro/campanii) ---------- */
+const CAMPAIGNS = [
+  { id:'taieri', name:'Stop tăierilor ilegale', url:'https://agentgreen.ro/campanii' },
+  { id:'virgine', name:'Protecția pădurilor virgine', url:'https://agentgreen.ro/campanii' },
+  { id:'parcuri', name:'Parcuri naționale', url:'https://agentgreen.ro/campanii' },
+  { id:'natura2000', name:'Natura 2000', url:'https://agentgreen.ro/campanii' },
+  { id:'schelet', name:'Scheletul României', url:'https://agentgreen.ro/campanii' },
+  { id:'wildlife', name:'Wildlife', url:'https://agentgreen.ro/campanii' },
+  { id:'balastiere', name:'STOP balastiere', url:'https://agentgreen.ro/campanii' },
+  { id:'dn66a', name:'STOP DN66A', url:'https://agentgreen.ro/campanii/stop-dn66a' },
+  { id:'plastic', name:'Plastic', url:'https://agentgreen.ro/campanii' },
+  { id:'avocat', name:'Avocatul Naturii (litigii)', url:'https://agentgreen.ro/proiecte/avocatul-naturii', project:true }
+];
+const campName = id => (CAMPAIGNS.find(c => c.id === id) || { name:id }).name;
+/* Costuri orientative — DE COMPLETAT de asociație. Folosite pentru „ce face donația ta”. */
+const COSTS = [
+  { k:'deplasare', label:'o deplasare de teren (2 oameni, o zi)', lei:450 },
+  { k:'drona', label:'o zi de filmare cu drona', lei:600 },
+  { k:'an', label:'un an de urmărire a unui dosar', lei:1800 },
+  { k:'actiune', label:'o acțiune în instanță (taxe și onorarii)', lei:2500 },
+  { k:'expertiza', label:'o expertiză silvică independentă', lei:3500 }
+];
+
+/* ---------- Tipuri de amenințări ---------- */
+const THREATS = {
+  taiere: { label:'Tăiere ilegală', icon:'tree', color:'#a15c12', sat:'forest', en:'suspected illegal logging', penal:true,
+    camps: z => ['taieri', ...(z && z.level === 'strict' ? ['virgine'] : []), ...(z && z.level !== 'none' ? ['parcuri'] : [])],
+    docSub:'o posibilă tăiere ilegală de arbori într-o arie naturală protejată',
+    findings:{ cioate:['Cioate proaspete','cioate proaspete de arbori tăiați recent'], ras:['Tăiere rasă','o tăiere rasă (suprafață defrișată integral)'], drum:['Drum forestier nou','un drum forestier nou deschis, cu arbori doborâți'], busteni:['Bușteni nemarcați','bușteni depozitați fără marcaj silvic vizibil'], transport:['Transport lemn','încărcarea sau transportul de material lemnos'] },
+    qty:[{k:'stumps',label:'Nr. cioate',ph:'38'},{k:'diam',label:'Diametru mediu (cm)',ph:'52'}],
+    estimate: c => { const v = volumeEstimate(c.q.stumps, c.q.diam); return v ? { v, unit:'m³', label:'VOLUM ESTIMAT', note:'Estimare orientativă: înălțime ≈25 m, coeficient de formă 0,45 (molid).' } : null; },
+    qtyText: c => c.q.stumps ? ` Au fost identificate aproximativ <b>${esc(c.q.stumps)} cioate</b>, cu un diametru mediu estimat de ${esc(c.q.diam || '—')} cm, ceea ce corespunde unui volum de aproximativ <b>${f1(volumeEstimate(c.q.stumps, c.q.diam))} m³</b>.` : '',
+    recipients:['gf','penal','ananp','info544','ec'],
+    legal:'Legea nr. 331/2024 – Codul silvic; OUG nr. 57/2007 privind regimul ariilor naturale protejate; Directiva 92/43/CEE (Habitate)',
+    link:{ href:'https://inspectorulpadurii.ro', label:'Deschide Inspectorul Pădurii' } },
+  amenajament: { label:'Amenajament / act de reglementare ilegal', icon:'scroll', color:'#3f6212', sat:'forest', en:'unlawful forest management plan / permit', penal:false,
+    camps: () => ['avocat', 'virgine', 'natura2000'],
+    docSub:'un act de reglementare care permite intervenții ilegale într-o arie naturală protejată',
+    findings:{ strict:['Tăieri planificate în zona strictă','planificarea de tăieri în zona de protecție strictă'], evaluare:['Fără evaluare adecvată','aprobarea fără evaluarea adecvată a impactului asupra sitului Natura 2000'], virgin:['Păduri virgine incluse la exploatare','includerea la exploatare a unor păduri potențial virgine'] },
+    qty:[{k:'ha',label:'Suprafață vizată (ha)',ph:'1200'},{k:'act',label:'Act atacat',ph:'Amenajament OS …',text:true}],
+    estimate: c => +c.q.ha ? { v:+c.q.ha, unit:'ha', label:'SUPRAFAȚĂ VIZATĂ', note:'Suprafața de pădure afectată de actul atacat.' } : null,
+    qtyText: c => `${c.q.act ? ` Actul vizat este <b>${esc(c.q.act)}</b>.` : ''}${c.q.ha ? ` Suprafața afectată este de aproximativ <b>${esc(c.q.ha)} ha</b>.` : ''}`,
+    recipients:['info544','ananp','ec'],
+    legal:'OUG nr. 57/2007; Legea nr. 331/2024 – Codul silvic; Legea nr. 554/2004 a contenciosului administrativ; Directiva 92/43/CEE (art. 6)', link:null },
+  braconaj: { label:'Braconaj / vânătoare ilegală', icon:'target', color:'#7a2e8e', sat:null, en:'suspected poaching', penal:true,
+    camps: z => ['wildlife', ...(z && z.level !== 'none' ? ['parcuri'] : [])],
+    docSub:'o posibilă faptă de braconaj într-o arie naturală protejată',
+    findings:{ lat:['Lațuri / capcane','lațuri sau capcane pentru animale sălbatice'], ucis:['Animal ucis','un animal sălbatic ucis'], foc:['Focuri de armă','focuri de armă într-o zonă în care vânătoarea este interzisă'], momeala:['Momitoare / hrănitoare','momitoare sau hrănitoare amplasate pentru atragerea vânatului'] },
+    qty:[{k:'count',label:'Nr. capcane / animale',ph:'4'},{k:'species',label:'Specie',ph:'urs brun',text:true}],
+    estimate:null,
+    qtyText: c => c.q.count ? ` Au fost identificate <b>${esc(c.q.count)}</b> ${c.finding === 'ucis' ? 'exemplare' : 'dispozitive'}${c.q.species ? ` (specia vizată: ${esc(c.q.species)})` : ''}.` : '',
+    recipients:['politie','penal','ananp','ec'],
+    legal:'Legea nr. 407/2006 a vânătorii și a protecției fondului cinegetic; OUG nr. 57/2007; Directiva 92/43/CEE (Habitate)', link:null },
+  lucrari: { label:'Lucrări / drum / hidrocentrală', icon:'build', color:'#475467', sat:'works', en:'suspected unauthorised works', penal:true,
+    camps: z => ['parcuri', 'natura2000'],
+    docSub:'executarea unor lucrări posibil neautorizate într-o arie naturală protejată',
+    findings:{ drum:['Drum nou / lărgire drum','deschiderea sau lărgirea unui drum'], captare:['Captare / derivație apă','lucrări de captare sau derivație a unui curs de apă (posibil microhidrocentrală)'], excav:['Excavări / defrișare','excavări și defrișări pentru lucrări de construcție'], constructie:['Construcție nouă','ridicarea unei construcții noi'] },
+    qty:[{k:'area',label:'Suprafață afectată (m²)',ph:'2500'},{k:'machines',label:'Utilaje observate',ph:'2'}],
+    estimate: c => +c.q.area ? { v:+c.q.area / 10000, unit:'ha', label:'SUPRAFAȚĂ AFECTATĂ', note:'Din suprafața declarată de echipă. În produs: măsurată pe imaginea satelitară.' } : null,
+    qtyText: c => c.q.area ? ` Suprafața afectată este de aproximativ <b>${esc(c.q.area)} m²</b>${c.q.machines ? `, cu ${esc(c.q.machines)} utilaje prezente` : ''}.` : '',
+    recipients:['gnm','penal','ananp','info544','ec'],
+    legal:'OUG nr. 57/2007; Legea nr. 292/2018 privind evaluarea impactului asupra mediului; Directiva 92/43/CEE; Directiva-cadru Apă 2000/60/CE', link:null },
+  rau: { label:'Balastieră / albie de râu', icon:'water', color:'#1d5c8c', sat:'river', en:'suspected illegal riverbed extraction', penal:true,
+    camps: () => ['balastiere'],
+    docSub:'exploatarea posibil neautorizată a albiei unui curs de apă',
+    findings:{ balast:['Extracție balast','extracția de balast și nisip din albia minoră'], deviere:['Albie deviată','devierea sau rectificarea albiei'], tulbure:['Utilaje în râu','utilaje care lucrează direct în apă, cu tulburarea puternică a râului'] },
+    qty:[{k:'length',label:'Lungime tronson (m)',ph:'400'},{k:'machines',label:'Utilaje observate',ph:'1'}],
+    estimate:null,
+    qtyText: c => c.q.length ? ` Tronsonul afectat are aproximativ <b>${esc(c.q.length)} m</b>${c.q.machines ? `, cu ${esc(c.q.machines)} utilaje în albie` : ''}.` : '',
+    recipients:['anar','gnm','penal','info544','ec'],
+    legal:'Legea apelor nr. 107/1996; OUG nr. 57/2007; Directiva-cadru Apă 2000/60/CE', link:null },
+  deseuri: { label:'Deșeuri / plastic', icon:'trash', color:'#6b5b2e', sat:null, en:'illegal waste dumping', penal:false,
+    camps: () => ['plastic'],
+    docSub:'depozitarea ilegală de deșeuri și poluarea mediului',
+    findings:{ depozit:['Depozit ilegal','un depozit ilegal de deșeuri'], apa:['Deșeuri în apă','deșeuri aruncate în albia unui curs de apă'], deversare:['Deversare','o deversare de substanțe poluante'] },
+    qty:[{k:'vol',label:'Volum aproximativ (m³)',ph:'6'}],
+    estimate:null,
+    qtyText: c => c.q.vol ? ` Volumul estimat al deșeurilor este de aproximativ <b>${esc(c.q.vol)} m³</b>.` : '',
+    recipients:['gnm','primarie','ananp'],
+    legal:'OUG nr. 92/2021 privind regimul deșeurilor; OUG nr. 195/2005 privind protecția mediului', link:null },
+  alta: { label:'Altă amenințare', icon:'alert', color:'#b42318', sat:null, en:'other environmental harm', penal:false,
+    camps: () => ['natura2000'],
+    docSub:'o posibilă faptă care afectează mediul într-o arie naturală protejată',
+    findings:{ incendiu:['Incendiu','urmele unui incendiu de vegetație'], acces:['Acces auto ilegal','acces auto / ATV în afara drumurilor permise'], altele:['Altceva','o situație care afectează mediul'] },
+    qty:[], estimate:null, qtyText: () => '',
+    recipients:['gnm','ananp','penal'],
+    legal:'OUG nr. 195/2005 privind protecția mediului; OUG nr. 57/2007', link:null }
+};
+const RECIP = {
+  gf:{ label:'Sesizare', sub:'Garda Forestieră', to:'Către: Garda Forestieră competentă teritorial', title:'SESIZARE',
+       ask:['efectuarea de urgență a unui control la fața locului, la coordonatele indicate;','stabilirea legalității tăierilor și a provenienței materialului lemnos;','aplicarea măsurilor legale, inclusiv indisponibilizarea materialului lemnos, după caz;'] },
+  gnm:{ label:'Sesizare', sub:'Garda de Mediu', to:'Către: Garda Națională de Mediu – comisariatul județean competent', title:'SESIZARE',
+       ask:['efectuarea unui control la fața locului, la coordonatele indicate;','verificarea existenței și respectării actelor de reglementare de mediu;','dispunerea opririi activității și aplicarea sancțiunilor legale, după caz;'] },
+  politie:{ label:'Sesizare', sub:'Poliție', to:'Către: Inspectoratul de Poliție Județean competent', title:'SESIZARE',
+       ask:['deplasarea de urgență la fața locului și ridicarea dispozitivelor / probelor;','identificarea persoanelor implicate;','sesizarea organelor de urmărire penală, după caz;'] },
+  anar:{ label:'Sesizare', sub:'Apele Române', to:'Către: Administrația Națională „Apele Române” – administrația bazinală competentă', title:'SESIZARE',
+       ask:['verificarea existenței avizului / autorizației de gospodărire a apelor;','oprirea lucrărilor neautorizate în albie;','dispunerea măsurilor de refacere a albiei;'] },
+  primarie:{ label:'Sesizare', sub:'Primăria', to:'Către: Primăria pe raza căreia se află amplasamentul', title:'SESIZARE',
+       ask:['ecologizarea de urgență a amplasamentului;','identificarea și sancționarea persoanelor responsabile;','luarea de măsuri pentru prevenirea repetării faptei;'] },
+  ananp:{ label:'Sesizare', sub:'ANANP', to:'Către: Agenția Națională pentru Arii Naturale Protejate – structura teritorială competentă', title:'SESIZARE',
+       ask:['verificarea conformității situației cu planul de management al ariei;','sesizarea organelor de control și de urmărire penală, după caz;','dispunerea măsurilor de refacere ecologică;'] },
+  penal:{ label:'Plângere penală', sub:'Parchet', to:'Către: Parchetul competent', title:'PLÂNGERE PENALĂ',
+       ask:['începerea urmăririi penale cu privire la faptele descrise;','efectuarea unei cercetări la fața locului și conservarea urmelor;','identificarea tuturor persoanelor implicate;','administrarea probelor anexate, a căror integritate poate fi verificată prin amprentele SHA-256;'] },
+  info544:{ label:'Cerere 544', sub:'Informații publice', to:'Către: autoritatea competentă', title:'CERERE', ask:[] },
+  ec:{ label:'Complaint (EN)', sub:'Comisia Europeană', to:'To: European Commission – DG Environment', title:'COMPLAINT', ask:[] }
+};
+
+/* ==================================================================
+   MOTOR JURIDIC
+   Termenele de mai jos urmează textul legii; TREBUIE validate cu un jurist.
+   ================================================================== */
+const PROC_KIND = { admin:'Procedură administrativă', penal:'Dosar penal', contencios:'Contencios administrativ', ce:'Comisia Europeană' };
+const EV = {
+  sesizare:{ label:'Sesizare depusă', k:['admin'] },
+  cerere544:{ label:'Cerere de informații publice (544) depusă', k:['admin'] },
+  revenire:{ label:'Revenire depusă', k:['admin'] },
+  raspuns:{ label:'Răspuns primit', k:['admin','contencios'], res:true },
+  act_nefavorabil:{ label:'Act sau răspuns nefavorabil comunicat', k:['admin','contencios'] },
+  plangere_prealabila:{ label:'Plângere prealabilă depusă', k:['admin','contencios'] },
+  actiune:{ label:'Acțiune în contencios depusă', k:['contencios','admin'] },
+  plangere_penala:{ label:'Plângere penală depusă', k:['penal'] },
+  stadiu:{ label:'Cerere privind stadiul dosarului', k:['penal'] },
+  clasare:{ label:'Ordonanță de clasare comunicată', k:['penal'], bad:true },
+  plangere339:{ label:'Plângere împotriva clasării depusă', k:['penal'] },
+  respingere339:{ label:'Respingerea plângerii comunicată', k:['penal'], bad:true },
+  plangere340:{ label:'Plângere la judecătorul de cameră preliminară', k:['penal'] },
+  rechizitoriu:{ label:'Trimitere în judecată', k:['penal'] },
+  termen:{ label:'Termen de judecată', k:['penal','contencios'] },
+  hotarare_fond:{ label:'Hotărâre în primă instanță', k:['penal','contencios'], res:true },
+  cale_atac:{ label:'Cale de atac declarată', k:['penal','contencios'] },
+  definitiv:{ label:'Hotărâre definitivă', k:['penal','contencios'], res:true, final:true },
+  prescriptie:{ label:'Prescripție constatată', k:['penal'], bad:true, final:true },
+  plangere_ce:{ label:'Plângere la Comisia Europeană depusă', k:['ce'] },
+  ce_info:{ label:'Comisia a cerut informații statului', k:['ce'] },
+  infringement:{ label:'Procedură de infringement deschisă', k:['ce'] }
+};
+const RULES = {
+  clasare:{ ours:true, days:20, label:'Plângere împotriva clasării, la procurorul ierarhic', basis:'art. 339 alin. (4) C.proc.pen. — 20 de zile de la comunicare', closedBy:['plangere339'], doc:'plangere339' },
+  respingere339:{ ours:true, days:20, label:'Plângere la judecătorul de cameră preliminară', basis:'art. 340 alin. (1) C.proc.pen. — 20 de zile de la comunicare', closedBy:['plangere340'], doc:'plangere340' },
+  act_nefavorabil:{ ours:true, days:30, label:'Plângere prealabilă la autoritatea emitentă', basis:'art. 7 alin. (1) Legea nr. 554/2004 — 30 de zile de la comunicare', closedBy:['plangere_prealabila','actiune'], doc:'plangere_prealabila' },
+  sesizare:{ ours:false, days:30, label:'Răspuns la sesizare', basis:'OG nr. 27/2002 — 30 de zile', closedBy:['raspuns','act_nefavorabil','revenire'], doc:'revenire' },
+  revenire:{ ours:false, days:30, label:'Răspuns la revenire', basis:'OG nr. 27/2002 — 30 de zile', closedBy:['raspuns','act_nefavorabil'], doc:null },
+  cerere544:{ ours:false, days:10, label:'Răspuns la cererea de informații publice', basis:'Legea nr. 544/2001 — 10 zile (până la 30 pentru informații complexe)', closedBy:['raspuns','act_nefavorabil'], doc:null },
+  plangere_prealabila:{ ours:false, days:30, label:'Soluționarea plângerii prealabile', basis:'Legea nr. 554/2004 — 30 de zile', closedBy:['raspuns','act_nefavorabil','actiune'], doc:null }
+};
+const RULE_ACTIUNE = { ours:true, days:183, label:'Acțiune în contencios administrativ', basis:'art. 11 Legea nr. 554/2004 — 6 luni (DE VALIDAT cu juristul)', closedBy:['actiune'], doc:null, validate:true };
+const PENALTIES = { le1:{ label:'până la 1 an sau amendă', y:3 }, '1-5':{ label:'peste 1 an, până la 5 ani', y:5 }, '5-10':{ label:'peste 5 ani, până la 10 ani', y:8 }, '10-20':{ label:'peste 10 ani, până la 20 de ani', y:10 } };
+const FIELD = { activ:['Activitatea continuă', 'danger'], oprit:['Oprit pe teren', 'ok'], necunoscut:['Necunoscut', ''] };
+const OUT = { castigat:['Câștigat în instanță','ok','#1f7a45'], rezolvat:['Rezolvat administrativ','ok','#56c47f'], procedura:['În procedură','info','#1d5c8c'], clasat:['Clasat','warn','#e0a100'], prescris:['Prescris','danger','#b42318'], pierdut:['Pierdut','danger','#7a1f17'], fara:['Fără procedură','','#9bab9f'] };
+
+const sortedEv = p => [...p.events].sort((a, b) => a.ts - b.ts);
+const isFinal = p => p.events.some(e => EV[e.type]?.final);
+function deadlines(c){
+  const out = [];
+  (c.procs || []).forEach(p => {
+    const evs = sortedEv(p).filter(e => e.ts <= now());
+    evs.forEach((e, i) => {
+      let rule = RULES[e.type]; if (!rule) return;
+      if (e.type === 'act_nefavorabil' && evs.slice(0, i).some(x => x.type === 'plangere_prealabila')) rule = RULE_ACTIUNE;
+      if (evs.slice(i + 1).some(x => rule.closedBy.includes(x.type))) return;
+      if (isFinal(p)) return;
+      const due = e.ts + rule.days * DAY;
+      out.push({ c, p, e, rule, due, left: Math.ceil((due - now()) / DAY) });
+    });
+  });
+  return out;
+}
+const oursOpen = c => deadlines(c).filter(d => d.rule.ours).sort((a, b) => a.due - b.due);
+const theirsLate = c => deadlines(c).filter(d => !d.rule.ours && d.left < 0);
+function prescription(c){
+  if (!c.legal || !c.legal.penalty || !THREATS[c.threat].penal) return null;
+  const pen = (c.procs || []).filter(p => p.kind === 'penal');
+  if (pen.some(p => p.events.some(e => e.type === 'definitiv' || e.type === 'prescriptie'))) return { closed:true };
+  const y = PENALTIES[c.legal.penalty].y, f = c.dateFapta || c.created;
+  const general = f + y * YEAR, special = f + 2 * y * YEAR;
+  return { f, y, general, special, leftGen: general - now(), leftSpec: special - now(), hasPenal: pen.length > 0 };
+}
+function nextHearing(c){ const h = (c.procs || []).flatMap(p => p.events.filter(e => e.type === 'termen' && e.ts > now()).map(e => ({ p, e }))).sort((a, b) => a.e.ts - b.e.ts); return h[0] || null; }
+function idleOf(p){ const evs = sortedEv(p).filter(e => e.ts <= now()); if (!evs.length || isFinal(p)) return 0; const fut = p.events.some(e => e.ts > now()); return fut ? 0 : now() - evs[evs.length - 1].ts; }
+function legalStart(c){ const t = (c.procs || []).flatMap(p => p.events.map(e => e.ts)); return t.length ? Math.min(...t) : null; }
+function legalAge(c){ const s = legalStart(c); if (s == null) return 0; const ps = c.procs || []; const allFinal = ps.length && ps.every(isFinal); const end = allFinal ? Math.max(...ps.flatMap(p => p.events.filter(e => EV[e.type]?.final).map(e => e.ts))) : now(); return end - s; }
+function legalOutcome(c){
+  const ps = c.procs || []; if (!ps.length) return 'fara';
+  const evs = ps.flatMap(p => p.events.filter(e => e.ts <= now()).map(e => ({ p, e })));
+  if (evs.some(x => x.e.type === 'definitiv' && x.e.win === true)) return 'castigat';
+  if (evs.some(x => x.e.type === 'definitiv' && x.e.win === false)) return 'pierdut';
+  if (evs.some(x => x.e.type === 'prescriptie')) return 'prescris';
+  if (ps.some(p => p.kind === 'admin' && p.events.some(e => e.type === 'raspuns' && e.win === true)) && !ps.some(p => p.kind === 'penal' && !isFinal(p) && p.events.some(e => e.type === 'rechizitoriu'))) return 'rezolvat';
+  const pen = ps.filter(p => p.kind === 'penal');
+  if (pen.length && pen.every(p => { const e = sortedEv(p).filter(x => x.ts <= now()); const last = e[e.length - 1]; return last && (last.type === 'clasare' || last.type === 'respingere339') && (now() - last.ts) > 20 * DAY; })) return 'clasat';
+  return 'procedura';
+}
+function fieldDays(c){ return c.field && c.field.status === 'oprit' && c.field.at ? Math.max(0, Math.round((c.field.at - (c.dateFapta || c.created)) / DAY)) : null; }
+
+/* ---------- Stare ---------- */
+const state = { role:'team', view:'home', current:null, step:0, cases:[], reports:[], partners:[], history:null,
+  filter:'all', seg:'all', subset:null, docType:null, fingerprint:'', impactSeg:'rezultate', campaign:null, amount:100,
+  legalDoc:null, lastFix:null, vdraft:null, myName:'Voluntar demo' };
+let maps = [];
+function persist(){ try { localStorage.setItem(STORE, JSON.stringify({ cases:state.cases, reports:state.reports, partners:state.partners, role:state.role })); } catch (e) {} }
+function load(){ try { const r = localStorage.getItem(STORE); return r ? JSON.parse(r) : null; } catch (e) { return null; } }
+const cur = () => state.cases.find(c => c.id === state.current);
+const zoneOf = c => c.loc ? (c.zone || evalZone(c.loc.lat, c.loc.lng)) : null;
+function addLog(c, msg, ts = now()){ c.log.push({ ts, msg }); }
+function nextCode(){ const y = new Date().getFullYear(); const n = Math.max(0, ...state.cases.filter(c => c.code.startsWith('AG-' + y)).map(c => +c.code.split('-')[2] || 0)) + 1; return `AG-${y}-${String(n).padStart(4, '0')}`; }
+function newCase(threat, title){
+  return { id:'c' + uid(), code:nextCode(), threat, title: title || THREATS[threat].label, created:now(), dateFapta:now(),
+    evidence:[], finding:Object.keys(THREATS[threat].findings)[0], q:{}, notes:'', ha:'', loc:null, zone:null, manualCheck:false,
+    camps:[], done:[], log:[], procs:[], field:{ status:'activ', at:null }, legal:{ penalty: THREATS[threat].penal ? '1-5' : null, owner:'Echipa juridică', owners:[] },
+    campaign:{ published:false, signatures:0 }, source:'echipa', reporter:null, demo:false };
+}
+
+/* ---------- Ilustrații demo ---------- */
+function sceneSVG(type, seed){
+  const s = seed || .5, sky = `hsl(${95 + s * 20},22%,${30 + s * 8}%)`;
+  const fig = {
+    taiere:`<circle cx='${45 + s * 10}' cy='54' r='${20 + s * 8}' fill='hsl(32,55%,62%)'/><circle cx='${45 + s * 10}' cy='54' r='${13 + s * 5}' fill='none' stroke='hsl(32,40%,44%)' stroke-width='1.4'/><circle cx='${45 + s * 10}' cy='54' r='${7 + s * 3}' fill='none' stroke='hsl(32,40%,44%)' stroke-width='1.2'/>`,
+    amenajament:`<rect x='28' y='22' width='44' height='56' rx='3' fill='#f4f1e8'/><path d='M36 36h28M36 46h28M36 56h18' stroke='#8a8a7a' stroke-width='3'/><circle cx='62' cy='66' r='7' fill='#b42318' opacity='.8'/>`,
+    braconaj:`<path d='M20 60 Q50 30 80 60' stroke='#b9b9b9' stroke-width='2.5' fill='none'/><circle cx='50' cy='45' r='9' fill='none' stroke='#cfcfcf' stroke-width='2'/><path d='M50 54 V80' stroke='#8a8a8a' stroke-width='2'/>`,
+    lucrari:`<rect x='22' y='44' width='42' height='20' rx='3' fill='#e0a100'/><path d='M60 46 L80 26 L86 32 L70 50' fill='#e0a100'/><circle cx='32' cy='68' r='6' fill='#333'/><circle cx='54' cy='68' r='6' fill='#333'/>`,
+    rau:`<path d='M0 55 Q25 45 50 58 T100 52 V75 Q75 82 50 72 T0 78Z' fill='hsl(35,25%,55%)'/><rect x='58' y='36' width='24' height='14' rx='2' fill='#e0a100'/>`,
+    deseuri:`<ellipse cx='40' cy='62' rx='18' ry='12' fill='#2b2b2b'/><ellipse cx='62' cy='66' rx='14' ry='10' fill='#3c3c3c'/><rect x='48' y='44' width='12' height='16' fill='#cfd8dc'/>`,
+    alta:`<path d='M30 80 Q40 40 50 60 Q60 30 70 80Z' fill='#e2572b'/><path d='M40 80 Q48 56 54 66 Q58 52 62 80Z' fill='#f6b233'/>`
+  }[type] || '';
+  return 'data:image/svg+xml;utf8,' + encodeURIComponent(`<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='${sky}'/>${fig}<path d='M0 88 Q30 80 60 90 T100 86 V100 H0Z' fill='hsl(95,20%,20%)'/></svg>`);
+}
+
+/* ---------- Date demo (fictive, multi-anuale) ---------- */
+async function buildDemo(){
+  const cases = [], T = now();
+  const ev = (type, ago, o = {}) => ({ id:'e' + uid(), type, ts: T - ago, ...o });
+  const mk = async (o) => {
+    const c = newCase(o.threat, o.title); c.code = o.code; c.demo = true; c.created = T - o.created; c.dateFapta = T - (o.fapta || o.created);
+    c.finding = o.finding; c.q = o.q || {}; c.notes = o.notes || ''; c.ha = o.ha ?? '';
+    c.loc = { lat:o.lat, lng:o.lng, acc:6, source:'GPS probe' }; c.zone = evalZone(o.lat, o.lng);
+    c.camps = o.camps || THREATS[o.threat].camps(c.zone);
+    for (let i = 0; i < (o.ev || 2); i++) {
+      const ts = c.dateFapta + DAY + i * 24e4, nm = o.evNames ? o.evNames[i] : `IMG_${o.code.slice(-4)}_${i + 1}.jpg`;
+      c.evidence.push({ name:nm, type: nm.startsWith('VID') ? 'video' : 'image', size: 2800000 + Math.round(seeded(o.lat, i) * 900000), ts, lat:o.lat + (i - 1) * 2e-4, lng:o.lng + (i - 1) * 2.4e-4, acc:5 + i * 2, hash: await sha256('agent-green-demo-' + nm + ts), thumb: nm.startsWith('VID') ? '' : sceneSVG(o.threat, i / 3), demo:true });
+    }
+    c.field = o.field; c.legal = { penalty: o.penalty ?? (THREATS[o.threat].penal ? '1-5' : null), owner: o.owner || 'Echipa juridică', owners: o.owners || [] };
+    c.procs = (o.procs || []).map(p => ({ id:'p' + uid(), kind:p.kind, authority:p.authority, number:p.number || '', events:p.events }));
+    c.done = o.done || [0, 1, 2, 3, 4, 5];
+    addLog(c, 'Caz deschis pe teren', c.dateFapta + DAY);
+    c.evidence.forEach(e => addLog(c, `Probă capturată ${e.name} · SHA-256 ${e.hash.slice(0, 12)}…`, e.ts));
+    addLog(c, `Zonă verificată: ${c.zone.name}`, c.dateFapta + DAY + 9e5);
+    c.procs.forEach(p => p.events.filter(e => e.ts <= T).forEach(e => addLog(c, `${PROC_KIND[p.kind]} · ${p.authority}: ${EV[e.type].label}${e.regNo ? ', nr. ' + e.regNo : ''}`, e.ts)));
+    if (c.field.status === 'oprit' && c.field.at) addLog(c, 'Activitatea s-a oprit pe teren', c.field.at);
+    (c.legal.owners || []).forEach(h => addLog(c, `Caz predat către ${h.name}`, h.from));
+    if (o.campaign) c.campaign = o.campaign;
+    cases.push(c); return c;
+  };
+  const Y = YEAR;
+  await mk({ threat:'taiere', code:'AG-2026-0041', title:'Valea Râu-Șes — tăiere în zona strict protejată', created:36 * DAY, fapta:37 * DAY, finding:'cioate', q:{ stumps:38, diam:52 }, ha:3.4,
+    notes:'Cioate proaspete, rumeguș nedegradat, fără marcaj silvic pe cioate. Urme de tractor forestier spre drumul de vale.', lat:DEMO_POINT.lat, lng:DEMO_POINT.lng,
+    ev:3, evNames:['IMG_cioata_01.jpg','IMG_cioata_02.jpg','VID_panoramic_03.mp4'], field:{ status:'oprit', at:T - 32 * DAY }, owner:'Ana (jurist)',
+    procs:[ { kind:'admin', authority:'Garda Forestieră', events:[ ev('sesizare', 34 * DAY, { regNo:'1287' }) ] },
+            { kind:'penal', authority:'Parchet', number:'882/P/2026', events:[ ev('plangere_penala', 20 * DAY, { regNo:'882/P/2026' }) ] } ] });
+  await mk({ threat:'taiere', code:'AG-2023-0118', title:'Valea Lăpușnicului Mare — tăiere rasă', created:3.6 * Y, finding:'ras', q:{ stumps:410, diam:46 }, ha:28,
+    lat:45.318, lng:22.955, field:{ status:'oprit', at:T - 3.6 * Y + 21 * DAY }, owner:'Ana (jurist)', owners:[ { name:'Mihai (jurist)', from:T - 3.5 * Y }, { name:'Ana (jurist)', from:T - 1.2 * Y } ],
+    procs:[ { kind:'admin', authority:'Garda Forestieră', events:[ ev('sesizare', 3.58 * Y, { regNo:'884' }), ev('raspuns', 3.5 * Y, { win:null, note:'Control efectuat, contravenție aplicată' }) ] },
+            { kind:'penal', authority:'Parchet', number:'211/P/2023', events:[ ev('plangere_penala', 3.55 * Y, { regNo:'211/P/2023' }), ev('stadiu', 2.1 * Y), ev('clasare', 9 * DAY, { regNo:'Ordonanța din dosarul 211/P/2023', note:'Clasare: „fapta nu a fost săvârșită de suspect”' }) ] } ] });
+  await mk({ threat:'lucrari', code:'AG-2018-0007', title:'Microhidrocentrală pe Râul Alb', created:8.2 * Y, finding:'captare', q:{ area:14000, machines:3 }, ha:1.4,
+    lat:45.442, lng:22.79, field:{ status:'oprit', at:T - 8.2 * Y + 400 * DAY }, owner:'Ana (jurist)', owners:[ { name:'Ioana (jurist)', from:T - 8.1 * Y }, { name:'Mihai (jurist)', from:T - 5 * Y }, { name:'Ana (jurist)', from:T - 1.2 * Y } ],
+    procs:[ { kind:'contencios', authority:'Tribunal (contencios)', number:'3310/97/2018', events:[ ev('act_nefavorabil', 8 * Y, { note:'Autorizație de construire emisă' }), ev('plangere_prealabila', 7.95 * Y), ev('act_nefavorabil', 7.86 * Y, { note:'Plângerea prealabilă a fost respinsă' }), ev('actiune', 7.75 * Y, { regNo:'3310/97/2018' }), ev('termen', 7.2 * Y), ev('termen', 6.9 * Y), ev('hotarare_fond', 6.5 * Y, { win:true, note:'Autorizația a fost anulată' }), ev('cale_atac', 6.4 * Y, { note:'Recurs declarat de beneficiar' }), ev('definitiv', 5.2 * Y, { win:true, note:'Anularea autorizației a rămas definitivă' }) ] },
+            { kind:'penal', authority:'Parchet / instanță', number:'1402/P/2018', events:[ ev('plangere_penala', 8.1 * Y, { regNo:'1402/P/2018' }), ev('rechizitoriu', 5 * Y), ev('termen', 4 * Y), ev('termen', 3.1 * Y), ev('hotarare_fond', 1.8 * Y, { win:true, note:'Condamnare în primă instanță' }), ev('cale_atac', 1.7 * Y, { note:'Apel declarat de inculpați' }), ev('termen', 0.6 * Y), ev('termen', -23 * DAY, { note:'Curtea de Apel' }) ] } ] });
+  await mk({ threat:'braconaj', code:'AG-2020-0033', title:'Lațuri pentru urși — Valea Râușorului', created:6.3 * Y, finding:'lat', q:{ count:6, species:'urs brun' },
+    lat:45.405, lng:22.84, field:{ status:'oprit', at:T - 6.3 * Y + 2 * DAY }, owner:'Ana (jurist)', owners:[ { name:'Ioana (jurist)', from:T - 6.2 * Y }, { name:'Ana (jurist)', from:T - 1.2 * Y } ],
+    procs:[ { kind:'penal', authority:'Parchet', number:'560/P/2020', events:[ ev('plangere_penala', 6.25 * Y, { regNo:'560/P/2020' }), ev('stadiu', 4 * Y), ev('prescriptie', 0.9 * Y, { note:'Dosar clasat ca urmare a împlinirii termenului de prescripție' }) ] } ] });
+  await mk({ threat:'rau', code:'AG-2024-0090', title:'Balastieră în albia Râului Mare', created:2.1 * Y, finding:'balast', q:{ length:400, machines:1 }, ha:2.2,
+    notes:'Excavator în albia minoră, grămezi de balast pe mal, apa tulbure pe ~1 km în aval.', lat:45.305, lng:22.705, field:{ status:'activ', at:null }, owner:'Ana (jurist)',
+    procs:[ { kind:'admin', authority:'Apele Române', events:[ ev('sesizare', 2.05 * Y, { regNo:'AB-3390' }), ev('raspuns', 1.9 * Y, { win:null, note:'Constatare programată' }), ev('act_nefavorabil', 22 * DAY, { note:'Aviz de gospodărire a apelor emis pentru exploatare' }) ] },
+            { kind:'admin', authority:'Garda de Mediu', events:[ ev('sesizare', 70 * DAY, { regNo:'GNM-1150' }) ] } ] });
+  await mk({ threat:'amenajament', code:'AG-2023-0151', title:'Amenajament silvic cu tăieri în zona strictă', created:3 * Y, finding:'strict', q:{ ha:1200, act:'Amenajamentul OS demo (2022–2031)' }, ha:1200,
+    lat:45.37, lng:22.88, field:{ status:'oprit', at:T - 2.6 * Y }, penalty:null, owner:'Ana (jurist)', owners:[ { name:'Mihai (jurist)', from:T - 3 * Y }, { name:'Ana (jurist)', from:T - 1.2 * Y } ], camps:['avocat','virgine','natura2000'],
+    procs:[ { kind:'admin', authority:'Ministerul Mediului', events:[ ev('cerere544', 3 * Y), ev('raspuns', 2.95 * Y, { win:null, note:'Amenajamentul a fost comunicat' }) ] },
+            { kind:'contencios', authority:'Curtea de Apel (contencios)', number:'812/2/2023', events:[ ev('plangere_prealabila', 2.9 * Y), ev('act_nefavorabil', 2.8 * Y, { note:'Plângerea prealabilă respinsă' }), ev('actiune', 2.7 * Y, { regNo:'812/2/2023' }), ev('termen', 2.1 * Y, { note:'Suspendarea executării admisă — tăierile oprite' }), ev('termen', 1.4 * Y), ev('termen', 0.7 * Y), ev('termen', -48 * DAY) ] },
+            { kind:'ce', authority:'Comisia Europeană', number:'CHAP(2023)demo', events:[ ev('plangere_ce', 2.5 * Y), ev('ce_info', 1.1 * Y) ] } ] });
+  await mk({ threat:'deseuri', code:'AG-2025-0019', title:'Depozit ilegal de deșeuri lângă Cârnic', created:1.1 * Y, finding:'depozit', q:{ vol:6 }, ha:0.3,
+    lat:45.428, lng:22.915, field:{ status:'oprit', at:T - 1.1 * Y + 40 * DAY }, owner:'Radu (voluntar coordonator)',
+    procs:[ { kind:'admin', authority:'Primăria', events:[ ev('sesizare', 1.08 * Y, { regNo:'2211' }), ev('raspuns', 1.01 * Y, { win:true, note:'Amplasamentul a fost ecologizat' }) ] } ] });
+  await mk({ threat:'braconaj', code:'AG-2026-0044', title:'Lațuri pe poteca spre Lacul Bucura', created:13 * DAY, finding:'lat', q:{ count:4, species:'urs brun' },
+    notes:'Patru lațuri din cablu de oțel, ancorate de molizi, la 40 m de potecă.', lat:45.3628, lng:22.8756, field:{ status:'necunoscut', at:null }, owner:'Ana (jurist)',
+    procs:[ { kind:'admin', authority:'Poliție', events:[ ev('sesizare', 12 * DAY, { regNo:'IPJ-5521' }) ] } ], campaign:{ published:true, signatures:3120 }, done:[0,1,2,3,4,5,6] });
+  const reports = [];
+  const rp = async (threat, desc, who, lat, lng, h) => reports.push({ id:'r' + uid(), threat, desc, reporter:who, lat, lng, acc:12, ts:T - h * 36e5, status:'nou', caseId:null, thumb:sceneSVG(threat, seeded(lat, lng)), hash: await sha256('agent-green-report-' + desc), demo:true });
+  await rp('taiere', 'Am auzit drujbe toată dimineața sub Lacul Bucura. Bușteni proaspeți lângă potecă.', 'Andrei M.', 45.3555, 22.862, 2);
+  await rp('braconaj', 'Capcană metalică pe marginea potecii, aproape de refugiul Gențiana.', 'Ioana P.', 45.371, 22.828, 5);
+  await rp('deseuri', 'Saci de gunoi aruncați în pârâu lângă parcare.', 'Mihai R.', 45.413, 22.79, 26);
+  await rp('rau', 'Utilaje în albia râului, apa e foarte tulbure în aval.', 'anonim', 45.309, 22.713, 50);
+  const partners = [
+    { id:'pt1', name:'Partener demo SRL', tier:'Gold', eur:10000, camp:'taieri', since:T - 200 * DAY },
+    { id:'pt2', name:'Campania „Donează Oxigen” (demo)', tier:'Campanie cauză', eur:0, camp:'virgine', since:T - 290 * DAY }
+  ];
+  return { cases, reports, partners };
+}
+/* Istoric sintetic pentru statisticile instituționale (DEMO). În produs: din toate dosarele asociației. */
+function buildHistory(){
+  const H = [], P = [], T = now();
+  [['Garda Forestieră',22,.28,.32],['Garda de Mediu',14,.36,.3],['Poliție',9,.5,.28],['Apele Române',8,.3,.35],['ANANP',8,.2,.3],['Primăria',6,.55,.25],['Ministerul Mediului',7,.15,.35]].forEach(([inst, n, inT, late], si) => {
+    for (let i = 0; i < n; i++) { const r = seeded(si + 1.3, i + 2.7); const filed = T - (60 + Math.floor(seeded(i + .5, si + .9) * 1600)) * DAY; let resp = null;
+      if (r < inT) resp = 4 + Math.floor(seeded(r, i) * 25); else if (r < inT + late) resp = 32 + Math.floor(seeded(i, r) * 200);
+      H.push({ inst, filedAt:filed, respDays:resp, days: inst === 'Ministerul Mediului' ? 30 : 30 }); }
+  });
+  [['clasat',9],['prescris',3],['judecata',4],['urmarire',11]].forEach(([o, n], k) => { for (let i = 0; i < n; i++) { const s = seeded(k + 3.1, i + 7.3); P.push({ outcome:o, years: o === 'urmarire' ? .5 + s * 5.5 : 1.2 + s * 5, idle: Math.round(2 + s * 30) }); } });
+  return { H, P };
+}
+
+/* ---------- Analiză ---------- */
+function satData(c){
+  const s = seeded(c.loc.lat, c.loc.lng), base = new Date(c.dateFapta || now()); const months = [];
+  for (let i = 18; i >= -3; i--) months.push(new Date(base.getFullYear(), base.getMonth() - i, 1));
+  const lossIdx = months.length - 4, river = THREATS[c.threat].sat === 'river';
+  const vals = months.map((d, i) => {
+    if (river) { let v = 0.18 + (seeded(i, s) - .5) * 0.05; if (i >= lossIdx) v += 0.45 + seeded(s, i) * .08; return Math.min(.95, v); }
+    const season = 0.5 + 0.28 * Math.sin((d.getMonth() - 3) / 12 * 2 * Math.PI); let v = season + (seeded(i, s) - .5) * 0.04; if (i >= lossIdx) v = v * 0.42 + 0.06; return Math.max(0.05, Math.min(0.92, v));
+  });
+  const ha = THREATS[c.threat].sat === 'works' ? 0.6 + s * 1.2 : 1.8 + s * 3.2;
+  return { months, vals, lossIdx, ha, lossDate: months[lossIdx], river };
+}
+function chartSVG(sd){
+  const W = 340, H = 150, P = { l:30, r:8, t:10, b:24 };
+  const xs = i => P.l + i * (W - P.l - P.r) / (sd.vals.length - 1), ys = v => P.t + (1 - v) * (H - P.t - P.b);
+  const path = sd.vals.map((v, i) => `${i ? 'L' : 'M'}${xs(i).toFixed(1)},${ys(v).toFixed(1)}`).join(' '), lx = xs(sd.lossIdx);
+  const labels = sd.months.map((d, i) => (i % 5 === 0 || i === sd.months.length - 1) ? `<text x="${xs(i)}" y="${H - 6}" font-size="9" text-anchor="middle" fill="currentColor" opacity=".6">${d.toLocaleDateString('ro-RO', { month:'short' })} ${String(d.getFullYear()).slice(2)}</text>` : '').join('');
+  const col = sd.river ? 'var(--info)' : 'var(--brand)';
+  return `<svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="Evoluție în timp">
+    ${[0.25, 0.5, 0.75].map(v => `<line x1="${P.l}" x2="${W - P.r}" y1="${ys(v)}" y2="${ys(v)}" stroke="currentColor" opacity=".1"/><text x="${P.l - 4}" y="${ys(v) + 3}" font-size="9" text-anchor="end" fill="currentColor" opacity=".55">${v.toFixed(2)}</text>`).join('')}
+    <rect x="${lx}" y="${P.t}" width="${W - P.r - lx}" height="${H - P.t - P.b}" fill="var(--danger)" opacity=".08"/><line x1="${lx}" x2="${lx}" y1="${P.t}" y2="${H - P.b}" stroke="var(--danger)" stroke-dasharray="3 3"/>
+    <path d="${path}" fill="none" stroke="${col}" stroke-width="2.2" stroke-linejoin="round"/>${sd.vals.map((v, i) => `<circle cx="${xs(i)}" cy="${ys(v)}" r="2" fill="${i >= sd.lossIdx ? 'var(--danger)' : col}"/>`).join('')}${labels}</svg>`;
+}
+function nearby(c, km = 5){
+  if (!c.loc) return [];
+  const yearAgo = now() - 3 * YEAR;
+  const cs = state.cases.filter(o => o.id !== c.id && o.loc && dist(c.loc, o.loc) <= km).map(o => ({ kind:'caz', t:o.threat, title:o.title, ts:o.created, d:dist(c.loc, o.loc), out:legalOutcome(o) }));
+  const rs = state.reports.filter(r => r.ts > yearAgo && r.caseId !== c.id && dist(c.loc, r) <= km).map(r => ({ kind:'raportare', t:r.threat, title:r.desc, ts:r.ts, d:dist(c.loc, r) }));
+  return [...cs, ...rs].sort((a, b) => a.d - b.d);
+}
+function checksFor(c){
+  const s = seeded(c.loc.lat + 1, c.loc.lng), z = zoneOf(c), inPark = z.level !== 'none';
+  const code = n => 'DEMO-' + Math.floor(seeded(s, n) * 1e6).toString(36).toUpperCase().padStart(4, '0');
+  switch (c.threat) {
+    case 'taiere': {
+      const apv = z.level === 'strict' ? 0 : (s > .5 ? 1 : 0);
+      const tr = [{ id:code(1), txt:`${f1(18 + s * 12)} m³ molid · acum ${Math.round(20 + s * 40)} h · spre Hațeg` }, { id:code(2), txt:`${f1(22 + s * 9)} m³ molid · acum ${Math.round(50 + s * 30)} h · spre Sebeș` }];
+      return { cards:[{ label:'ACTE DE PUNERE ÎN VALOARE (APV) · RAZĂ 2 KM', v:apv, unit: apv === 1 ? 'APV găsit' : 'APV-uri găsite', cls: apv ? 'warn' : 'danger', txt: apv ? 'Există un APV în zonă. Trebuie verificat dacă perimetrul și volumul corespund cu tăierea constatată.' : 'Nu există nicio autorizare de exploatare în zonă.' }],
+        list:{ title:'Transporturi de lemn din zonă · ultimele 96 h', icon:'truck', items: tr.map(t => [`Aviz ${t.id}`, t.txt]) },
+        doc: (apv ? 'În raza de 2 km a fost identificat un act de punere în valoare; solicităm verificarea concordanței cu tăierea constatată.' : 'În raza de 2 km nu a fost identificat niciun act de punere în valoare care să justifice tăierea.') + ` Au fost identificate ${tr.length} transporturi de material lemnos din zonă în ultimele 96 de ore (${tr.map(t => 'aviz ' + t.id).join(', ')}).` };
+    }
+    case 'amenajament':
+      return { cards:[{ label:'EVALUARE ADECVATĂ (NATURA 2000)', v:'Lipsă', unit:'', cls:'danger', txt:'Nu a fost identificată o evaluare adecvată publicată pentru actul vizat.' }, { label:'PARCELE ÎN ZONA STRICTĂ', v: z.level === 'strict' ? 'Da' : 'De verificat', unit:'', cls: z.level === 'strict' ? 'danger' : 'warn', txt:'Suprapunerea parcelelor din amenajament cu zonarea internă a parcului.' }],
+        list:null, doc:'Pentru actul vizat nu a fost identificată o evaluare adecvată publicată, iar parcele planificate pentru intervenții se suprapun cu zona de protecție strictă.' };
+    case 'braconaj':
+      return { cards:[{ label:'REGIM CINEGETIC AL ZONEI', v: inPark ? 'Interzis' : 'De verificat', unit:'', cls: inPark ? 'danger' : 'warn', txt: inPark ? 'Amplasamentul se află într-un parc național, unde vânătoarea nu este permisă.' : 'Se verifică fondul de vânătoare și gestionarul acestuia.' },
+        { label:'AUTORIZAȚII / COTE ACTIVE PENTRU SPECIE', v:0, unit:'găsite', cls:'danger', txt:'Nu există autorizații de vânătoare sau intervenție active în zonă pentru specia vizată.' }],
+        list:null, doc:`Amplasamentul ${inPark ? 'se află într-o arie în care vânătoarea este interzisă' : 'trebuie verificat în raport cu fondul de vânătoare'}, iar pentru zonă nu au fost identificate autorizații de vânătoare sau de intervenție active.` };
+    case 'lucrari':
+      return { cards:[{ label:'ACORD / AVIZ DE MEDIU ÎN ZONĂ', v:0, unit:'găsite', cls:'danger', txt:'Nu a fost identificat niciun act de reglementare de mediu publicat pentru amplasament.' }, { label:'AUTORIZAȚIE DE CONSTRUIRE', v:'Nepublică', unit:'', cls:'warn', txt:'Se cere prin Legea nr. 544/2001 la pasul Documente.' }],
+        list:null, doc:'Pentru amplasament nu a fost identificat niciun act de reglementare de mediu publicat. Existența autorizației de construire urmează să fie verificată prin cerere de informații de interes public.' };
+    case 'rau':
+      return { cards:[{ label:'AVIZ / AUTORIZAȚIE DE GOSPODĂRIRE A APELOR', v:0, unit:'găsite', cls:'danger', txt:'Nu a fost identificat niciun aviz pentru lucrări în acest tronson.' }],
+        list:null, doc:'Pentru tronsonul de râu afectat nu a fost identificat niciun aviz sau autorizație de gospodărire a apelor.' };
+    default: {
+      const n = nearby(c, 3).length;
+      return { cards:[{ label:'SESIZĂRI ANTERIOARE ÎN 3 KM', v:n, unit: n === 1 ? 'înregistrare' : 'înregistrări', cls: n ? 'warn' : 'info', txt: n ? 'Zona are istoric. Tiparul întărește cererea de măsuri permanente.' : 'Nu există alte înregistrări în apropiere.' }],
+        list:null, doc: n ? `În raza de 3 km au mai fost înregistrate ${n} situații similare.` : '' };
+    }
+  }
+}
+
+/* ---------- Documente ---------- */
+function lhHTML(c, label){ const nr = (c ? c.code + '/' : '') + fmtDs(now()).replace(/\./g, ''); return `<div class="lh"><div><b>ASOCIAȚIA AGENT GREEN</b><br><span style="font-size:11px">${label || 'Dosar de teren'}</span></div><div style="text-align:right;font-size:11px">Nr. ${nr}<br>${fmtD(now())}</div></div>`; }
+const footHTML = fp => `<div class="foot">Generat cu platforma Agent Green${fp ? ' · amprenta dosarului ' + fp : ''}<br>Document de lucru generat automat. Trebuie verificat juridic înainte de depunere. Termenele și temeiurile legale sunt de validat cu juristul asociației. Datele demonstrative sunt marcate ca atare.</div>`;
+const sign = `<p style="margin-top:18px">Cu stimă,<br>Asociația Agent Green<br>prin reprezentant legal ____________________</p>`;
+function evTable(c, en){
+  if (!c.evidence.length) return `<p><i>${en ? 'No files attached.' : 'Nu au fost atașate probe.'}</i></p>`;
+  const h = en ? ['File', 'Captured', 'GPS'] : ['Fișier', 'Capturat', 'GPS'];
+  return `<table><thead><tr><th>#</th><th>${h[0]}</th><th>${h[1]}</th><th>${h[2]}</th><th>SHA-256</th></tr></thead><tbody>${c.evidence.map((e, i) => `<tr><td>${i + 1}</td><td>${esc(e.name)}</td><td>${fmtDT(e.ts)}</td><td>${e.lat != null ? `${fx(e.lat)}, ${fx(e.lng)}` : '—'}</td><td class="hx">${e.hash}</td></tr>`).join('')}</tbody></table>`;
+}
+function firstTs(c){ return c.dateFapta || (c.evidence.length ? Math.min(...c.evidence.map(e => e.ts)) : c.created); }
+function procSummary(p, en){
+  const evs = sortedEv(p).filter(e => e.ts <= now()), last = evs[evs.length - 1], age = fmtDur(now() - (evs[0] ? evs[0].ts : now()));
+  if (en) return `${PROC_KIND[p.kind]} (${p.authority}${p.number ? ', ' + p.number : ''}) — open for ${age.replace(/ani|an/, 'yr').replace(/luni|lună/, 'mo').replace(' și ', ' ')}; last step: ${last ? EV[last.type].label : '—'}`;
+  return `${PROC_KIND[p.kind]} (${esc(p.authority)}${p.number ? ', nr. ' + esc(p.number) : ''}), deschisă de ${age}; ultimul pas: ${last ? EV[last.type].label.toLowerCase() : '—'}${last && idleOf(p) > 180 * DAY ? ` (fără nicio mișcare de ${fmtDur(idleOf(p))})` : ''}`;
+}
+function docHTML(c, rk, fp){
+  const T = THREATS[c.threat], R = RECIP[rk], z = zoneOf(c), val = valueOf(z), ch = checksFor(c), sd = T.sat ? satData(c) : null;
+  const fnd = T.findings[c.finding] ? T.findings[c.finding][1] : 'o situație care afectează mediul';
+  if (rk === 'ec') {
+    const zEn = z.level === 'strict' ? 'a strictly protected zone' : z.level === 'park' ? 'a protected area / Natura 2000 site' : 'an area to be confirmed';
+    return `${lhHTML(c, 'Field dossier')}<p>${R.to}</p><h4>COMPLAINT – SUMMARY OF FACTS</h4><p class="sub">Draft supporting the CHAP complaint form · ${T.en}</p>
+    <p><b>1. Facts.</b> On ${new Date(firstTs(c)).toLocaleDateString('en-GB')}, Agent Green Association documented ${T.en} inside ${zEn}: <b>${esc(z.name)}</b>, coordinates ${fx(c.loc.lat)}, ${fx(c.loc.lng)}.</p>
+    ${val ? `<p><b>2. What is at stake.</b> Habitats of Community interest (${val.habitats.map(h => h.split(' – ')[0]).join(', ')}) and strictly protected species including brown bear, wolf and lynx.</p>` : ''}
+    <p><b>3. National remedies and their duration.</b> ${(c.procs || []).filter(p => p.kind !== 'ce').length ? (c.procs || []).filter(p => p.kind !== 'ce').map(p => procSummary(p, true)).join('; ') + '.' : 'Complaints to national authorities are being prepared.'} National procedures have so far not ensured effective protection of the site.</p>
+    <p><b>4. Evidence.</b> Each file was hashed (SHA-256) at capture.</p>${evTable(c, true)}
+    <p><b>5. Request.</b> We ask the Commission to assess whether Romania fails to fulfil its obligations under Directive 92/43/EEC for this site and to open infringement proceedings if warranted.</p>${footHTML(fp)}`;
+  }
+  if (rk === 'info544') {
+    const items = { taiere:['actele de punere în valoare emise pentru amplasament și parcelele învecinate;','autorizațiile de exploatare și avizele de transport aferente;'], amenajament:['amenajamentul silvic în vigoare, cu hărțile și descrierile parcelare;','actul de reglementare de mediu și evaluarea adecvată care au stat la baza aprobării;'], lucrari:['autorizația de construire și documentația care a stat la baza emiterii ei;','actul de reglementare de mediu (acord / aviz / decizie de încadrare) și evaluarea adecvată;'], rau:['avizul și autorizația de gospodărire a apelor pentru lucrările din albie;','licența sau permisul de exploatare a agregatelor minerale;'] }[c.threat] || ['actele de reglementare emise pentru amplasament;'];
+    return `${lhHTML(c)}<p>${R.to}</p><h4>CERERE</h4><p class="sub">de comunicare a informațiilor de interes public, în temeiul Legii nr. 544/2001</p>
+    <p>Subscrisa <b>Asociația Agent Green</b> vă solicităm comunicarea, în format electronic, a următoarelor informații privind amplasamentul din <b>${esc(z.name)}</b> (coordonate ${fx(c.loc.lat)}, ${fx(c.loc.lng)}):</p>
+    <ol>${items.map(i => `<li>${i}</li>`).join('')}<li>orice control efectuat la acest amplasament în ultimele 12 luni și măsurile dispuse.</li></ol>
+    <p>Vă rugăm să ne comunicați răspunsul în termenul legal de 10 zile.</p>${sign}${footHTML(fp)}`;
+  }
+  const n = sd ? ['IV', 'V', 'VI', 'VII', 'VIII'] : ['IV', 'IV', 'V', 'VI', 'VII'];
+  return `${lhHTML(c)}<p>${R.to}</p><h4>${R.title}</h4><p class="sub">privind ${T.docSub}</p>
+  <p>Subscrisa <b>Asociația Agent Green</b>, prin reprezentant legal, formulăm prezenta ${R.title.toLowerCase()} și vă aducem la cunoștință următoarele:</p>
+  <p><b>I. Starea de fapt.</b> În data de ${fmtD(firstTs(c))}, ${c.source === 'voluntar' ? 'în urma unei raportări din partea unui cetățean, verificată ulterior de echipa asociației, ' : 'echipa de teren a asociației '}a constatat în <b>${esc(z.name)}</b>${z.park && z.park !== z.name ? ` (${esc(z.park)})` : ''}, la coordonatele <b>${fx(c.loc.lat)}, ${fx(c.loc.lng)}</b>, ${fnd}.${T.qtyText(c)}${c.notes ? ' ' + esc(c.notes) : ''}</p>
+  <p><b>II. Regimul juridic al zonei.</b> ${esc(z.regime)}</p>
+  ${val ? `<p><b>III. Valoarea ecologică afectată.</b> Zona are o valoare de conservare <b>${val.score.toLowerCase()}</b> și adăpostește habitate de interes comunitar (${val.habitats.join('; ')}) și specii strict protejate, între care ${val.species.slice(0, 3).join(', ')}.</p>` : ''}
+  ${sd ? `<p><b>IV. Analiza imaginilor satelitare.</b> ${sd.river ? 'Indicele de turbiditate a apei crește brusc' : `Indicele de vegetație arată o pierdere de aproximativ ${f1(sd.ha)} ha`}, începând cu ${fmtMY(sd.lossDate)}.</p>` : ''}
+  <p><b>${n[1]}. Verificarea evidențelor publice.</b> ${ch.doc}${c.manualCheck ? ' Datele au fost verificate și manual.' : ''}</p>
+  <p><b>${n[2]}. Probe.</b> Fiecare fișier a fost înregistrat la momentul capturii, cu oră, coordonate GPS și amprentă SHA-256.</p>${evTable(c)}
+  <p><b>${n[3]}. Temei legal.</b> ${T.legal}. <span class="todo">[Articolele aplicabile se completează de consilierul juridic.]</span></p>
+  <p><b>${n[4]}. Solicitări.</b> Vă solicităm:</p><ol>${R.ask.map(a => `<li>${a}</li>`).join('')}<li>comunicarea rezultatului către Asociația Agent Green în termenul legal de 30 de zile (OG nr. 27/2002).</li></ol>${sign}${footHTML(fp)}`;
+}
+/* Documente procedurale (din pasul Dosar juridic) */
+const LDOC = {
+  revenire:{ title:'REVENIRE', evt:'revenire' }, plangere339:{ title:'PLÂNGERE', evt:'plangere339' }, plangere340:{ title:'PLÂNGERE', evt:'plangere340' },
+  plangere_prealabila:{ title:'PLÂNGERE PREALABILĂ', evt:'plangere_prealabila' }, stadiu:{ title:'CERERE', evt:'stadiu' }
+};
+function legalDocHTML(c, kind, p, e, fp){
+  const z = zoneOf(c), T = THREATS[c.threat], pr = prescription(c);
+  const ref = e ? `${EV[e.type].label.toLowerCase()}${e.regNo ? ' (' + esc(e.regNo) + ')' : ''}, din data de ${fmtD(e.ts)}` : '';
+  const head = (to, title, sub) => `${lhHTML(c)}<p>${to}</p><h4>${title}</h4><p class="sub">${sub}</p>`;
+  const facts = `privind ${T.docSub}, în ${esc(z.name)} (coordonate ${fx(c.loc.lat)}, ${fx(c.loc.lng)})`;
+  if (kind === 'revenire') return `${head(RECIP[Object.keys(RECIP).find(k => RECIP[k].sub === p.authority)]?.to || 'Către: ' + esc(p.authority), 'REVENIRE', `la sesizarea nr. ${esc(e.regNo || '—')} din ${fmtD(e.ts)}`)}
+    <p>Subscrisa <b>Asociația Agent Green</b> revenim la sesizarea înregistrată sub nr. <b>${esc(e.regNo || '—')}</b> din ${fmtD(e.ts)}, ${facts}.</p>
+    <p>Termenul legal de 30 de zile prevăzut de OG nr. 27/2002 s-a împlinit la ${fmtD(e.ts + 30 * DAY)}, fără ca asociația să primească un răspuns.</p>
+    <p>Vă solicităm comunicarea de îndată a măsurilor dispuse. În lipsa unui răspuns, vom sesiza organele de urmărire penală, instanța de contencios administrativ și Comisia Europeană.</p>${sign}${footHTML(fp)}`;
+  if (kind === 'plangere339') return `${head('Către: Procurorul ierarhic superior celui care a dispus soluția', 'PLÂNGERE', `împotriva soluției de clasare — ${ref}, formulată în temeiul art. 339 C.proc.pen.`)}
+    <p>Subscrisa <b>Asociația Agent Green</b>, în calitate de persoană care a formulat plângerea penală${p.number ? ` în dosarul nr. <b>${esc(p.number)}</b>` : ''}, formulăm prezenta plângere împotriva soluției de clasare comunicată la ${fmtD(e.ts)}, în termenul de 20 de zile prevăzut de art. 339 alin. (4) C.proc.pen.</p>
+    <p><b>Motive.</b> Urmărirea penală este incompletă. Nu au fost administrate probele depuse de asociație, a căror integritate poate fi verificată prin amprentele SHA-256 de mai jos. <span class="todo">[Motivele de fapt și de drept se completează de consilierul juridic.]</span></p>${evTable(c)}
+    <p><b>Solicităm</b> infirmarea soluției de clasare și continuarea urmăririi penale, cu administrarea probelor indicate.</p>
+    ${pr && !pr.closed ? `<p>Precizăm că termenul general de prescripție a răspunderii penale se împlinește la <b>${fmtD(pr.general)}</b>, ceea ce impune soluționarea cu celeritate.</p>` : ''}${sign}${footHTML(fp)}`;
+  if (kind === 'plangere340') return `${head('Către: Judecătorul de cameră preliminară de la instanța competentă', 'PLÂNGERE', `împotriva soluției de clasare, în temeiul art. 340 C.proc.pen. — ${ref}`)}
+    <p>Subscrisa <b>Asociația Agent Green</b> formulăm plângere împotriva soluției de clasare${p.number ? ` din dosarul nr. <b>${esc(p.number)}</b>` : ''}, după respingerea plângerii noastre de către procurorul ierarhic, comunicată la ${fmtD(e.ts)}.</p>
+    <p><b>Motive.</b> <span class="todo">[Se completează de consilierul juridic: probele neadministrate, erorile de apreciere, încadrarea juridică.]</span></p>${evTable(c)}
+    <p><b>Solicităm</b> admiterea plângerii, desființarea soluției și trimiterea cauzei la procuror în vederea completării urmăririi penale.</p>${sign}${footHTML(fp)}`;
+  if (kind === 'plangere_prealabila') return `${head('Către: ' + esc(p.authority) + ' (autoritatea emitentă)', 'PLÂNGERE PREALABILĂ', 'în temeiul art. 7 din Legea nr. 554/2004 a contenciosului administrativ')}
+    <p>Subscrisa <b>Asociația Agent Green</b> formulăm plângere prealabilă împotriva actului comunicat la ${fmtD(e.ts)}${e.note ? ` (<b>${esc(e.note)}</b>)` : ''}, ${facts}.</p>
+    <p><b>Motive de nelegalitate.</b> Actul a fost emis fără evaluarea impactului asupra ariei naturale protejate și contravine regimului juridic al zonei: ${esc(z.regime)} <span class="todo">[Motivele detaliate se completează de consilierul juridic.]</span></p>
+    <p><b>Solicităm</b> revocarea actului în tot. În caz contrar, ne rezervăm dreptul de a ne adresa instanței de contencios administrativ.</p>${sign}${footHTML(fp)}`;
+  if (kind === 'stadiu') return `${head('Către: ' + esc(p.authority) + (p.number ? ', dosar nr. ' + esc(p.number) : ''), 'CERERE', 'privind stadiul dosarului penal și solicitarea de soluționare cu celeritate')}
+    <p>Subscrisa <b>Asociația Agent Green</b>, în calitate de persoană care a formulat plângerea penală înregistrată la ${fmtD(sortedEv(p)[0].ts)}, vă solicităm să ne comunicați stadiul cercetărilor${p.number ? ` în dosarul nr. <b>${esc(p.number)}</b>` : ''}.</p>
+    <p>Dosarul este deschis de <b>${fmtDur(now() - sortedEv(p)[0].ts)}</b>${idleOf(p) > 90 * DAY ? `, iar de ${fmtDur(idleOf(p))} asociația nu a primit nicio informare` : ''}.${pr && !pr.closed ? ` Termenul general de prescripție a răspunderii penale se împlinește la <b>${fmtD(pr.general)}</b>.` : ''}</p>
+    <p>Vă solicităm administrarea cu celeritate a probelor și dispunerea unei soluții înainte de împlinirea termenului de prescripție.</p>${sign}${footHTML(fp)}`;
+  return '';
+}
+async function fingerprint(c){ return sha256(JSON.stringify({ code:c.code, loc:c.loc, ev:c.evidence.map(e => [e.name, e.ts, e.hash]) })); }
+
+/* ---------- Statistici ---------- */
+function stats(cs = state.cases){
+  const out = {}; Object.keys(OUT).forEach(k => out[k] = 0); cs.forEach(c => out[legalOutcome(c)]++);
+  const known = cs.filter(c => c.field && c.field.status !== 'necunoscut');
+  const stopped = cs.filter(c => c.field && c.field.status === 'oprit');
+  const fd = stopped.map(fieldDays).filter(x => x != null).sort((a, b) => a - b);
+  const median = fd.length ? fd[Math.floor(fd.length / 2)] : null;
+  const procs = cs.flatMap(c => (c.procs || []).map(p => ({ c, p })));
+  const openJud = procs.filter(x => (x.p.kind === 'penal' || x.p.kind === 'contencios') && !isFinal(x.p));
+  const ages = openJud.map(x => now() - sortedEv(x.p)[0].ts);
+  const haProtected = cs.filter(c => (c.field && c.field.status === 'oprit') || ['castigat', 'rezolvat'].includes(legalOutcome(c))).reduce((s, c) => s + (+c.ha || 0), 0);
+  return { n:cs.length, out, known:known.length, stopped:stopped.length, active:cs.filter(c => c.field && c.field.status === 'activ').length, median,
+    openJud:openJud.length, avgAge: ages.length ? ages.reduce((a, b) => a + b, 0) / ages.length : 0, maxAge: ages.length ? Math.max(...ages) : 0,
+    wonCourt: procs.filter(x => x.p.events.some(e => e.type === 'definitiv' && e.win === true)).length,
+    haProtected, reports:state.reports.length, investigations: cs.filter(c => c.evidence.length).length,
+    signatures: cs.reduce((s, c) => s + (c.campaign?.signatures || 0), 0),
+    volunteers: new Set(state.reports.map(r => r.reporter).filter(r => r && r !== 'anonim')).size };
+}
+function instStats(){
+  const byInst = {};
+  const add = (inst, filedAt, respDays, days) => { const b = byInst[inst] = byInst[inst] || { inst, n:0, inTerm:0, late:0, never:0, pending:0, resp:[] }; b.n++;
+    if (respDays == null) { if (now() - filedAt > days * DAY) b.never++; else b.pending++; } else { b.resp.push(respDays); if (respDays <= days) b.inTerm++; else b.late++; } };
+  state.history.H.forEach(h => add(h.inst, h.filedAt, h.respDays, h.days));
+  state.cases.forEach(c => (c.procs || []).filter(p => p.kind === 'admin').forEach(p => { const evs = sortedEv(p);
+    evs.forEach((e, i) => { if (!['sesizare', 'cerere544', 'revenire', 'plangere_prealabila'].includes(e.type) || e.ts > now()) return;
+      const r = evs.slice(i + 1).find(x => x.type === 'raspuns' || x.type === 'act_nefavorabil'); add(p.authority, e.ts, r ? Math.round((r.ts - e.ts) / DAY) : null, RULES[e.type].days); }); }));
+  const insts = Object.values(byInst).map(b => { const s = [...b.resp].sort((x, y) => x - y); return { ...b, median: s.length ? s[Math.floor(s.length / 2)] : null, pctInTerm: b.n ? b.inTerm / b.n : 0, pctNever: b.n ? b.never / b.n : 0 }; }).sort((a, b) => b.pctNever - a.pctNever);
+  const P = [...state.history.P];
+  state.cases.forEach(c => (c.procs || []).filter(p => p.kind === 'penal').forEach(p => { const evs = sortedEv(p); const o = legalOutcome({ ...c, procs:[p] });
+    P.push({ outcome: o === 'clasat' ? 'clasat' : o === 'prescris' ? 'prescris' : p.events.some(e => e.type === 'rechizitoriu') ? 'judecata' : 'urmarire', years: (now() - evs[0].ts) / YEAR, idle: Math.round(idleOf(p) / (30.44 * DAY)) }); }));
+  const par = { n:P.length, clasat:P.filter(x => x.outcome === 'clasat').length, prescris:P.filter(x => x.outcome === 'prescris').length, judecata:P.filter(x => x.outcome === 'judecata').length, urmarire:P.filter(x => x.outcome === 'urmarire').length,
+    avgYears: P.reduce((s, x) => s + x.years, 0) / (P.length || 1), maxIdle: Math.max(0, ...P.map(x => x.idle)) };
+  return { insts, par };
+}
+
+/* ---------- Campanie (texte) ---------- */
+function speciesArt(val){ const ART = { 'Urs brun':'ursul brun', 'Lup':'lupul', 'Râs':'râsul', 'Capră neagră':'capra neagră', 'Cocoș de munte':'cocoșul de munte' };
+  const l = val ? val.species.slice(0, 3).map(s => ART[s.split(' (')[0]] || s.split(' (')[0].toLowerCase()) : []; return l.length > 1 ? l.slice(0, -1).join(', ') + ' și ' + l[l.length - 1] : (l[0] || ''); }
+function campaignTexts(c){
+  const T = THREATS[c.threat], z = zoneOf(c), val = valueOf(z), est = T.estimate ? T.estimate(c) : null;
+  const where = z.level === 'none' ? 'o zonă naturală' : z.name, fnd = T.findings[c.finding] ? T.findings[c.finding][1] : '', sp = speciesArt(val);
+  const late = theirsLate(c)[0], age = legalAge(c), fstop = fieldDays(c);
+  const status = [
+    c.field.status === 'oprit' ? `Distrugerea s-a oprit pe teren${fstop != null ? ` după ${zile(fstop)}` : ''}, dar nimeni nu a răspuns încă pentru ea.` : c.field.status === 'activ' ? 'Distrugerea continuă în acest moment.' : '',
+    age > 180 * DAY ? `Lupta juridică durează de ${fmtDur(age)}.` : '',
+    late ? `${late.p.authority} nu a răspuns la sesizare, deși termenul legal a expirat acum ${zile(-late.left)}.` : ''
+  ].filter(Boolean).join(' ');
+  const press = `COMUNICAT DE PRESĂ · ${fmtD(now())}
+
+Agent Green: ${T.label.toLowerCase()} în ${where}
+
+Echipa Agent Green a documentat ${fnd} în ${where}.${est ? ` Estimare: ${f1(est.v)} ${est.unit}.` : ''} Fiecare probă a fost înregistrată cu oră, coordonate GPS și amprentă digitală.
+
+${val ? `Zona are o valoare de conservare ${val.score.toLowerCase()} și adăpostește specii strict protejate precum ${sp}. ` : ''}${status}
+
+„[Citat – președintele asociației]”
+
+Agent Green cere oprirea definitivă a activității, tragerea la răspundere a celor vinovați și refacerea zonei.
+
+Contact presă: [nume, telefon, e-mail]`;
+  const social = `${T.label} în ${where}.
+
+Am fost acolo și am documentat totul: ${fnd}.${est ? ` Aproximativ ${f1(est.v)} ${est.unit}.` : ''}
+${val ? `Aici trăiesc ${sp}.\n` : ''}${status}
+
+Dosarele de mediu durează ani. Noi nu renunțăm. Susține munca juridică 👇
+agentgreen.ro/doneaza
+
+#AgentGreen #${z.level === 'none' ? 'NaturaRomaniei' : 'Retezat'}`;
+  const video = `SCRIPT VIDEO · 60 secunde · vertical 9:16
+
+0–5 s   Cadru larg (dronă) peste ${where}. Doar sunetul pădurii.
+5–15 s  Probele de teren (${fnd}). VO: „Asta am găsit pe ${fmtD(firstTs(c))}.”
+15–25 s Înainte / după din satelit sau harta cu amplasamentul.
+25–40 s ${val ? `Imagini cu ${sp}.` : 'Imagini ale zonei intacte.'} VO: „Asta se pierde.”
+40–50 s Pe ecran, cronologia reală: ${age > 180 * DAY ? `„${fmtDur(age)} de procese”` : '„ziua sesizării”'}${late ? ' și contorul de zile fără răspuns' : ''}.
+50–60 s VO: „Justiția e lentă. Noi suntem încăpățânați.” Logo, link donații.
+
+Notă: cadrele din probe rămân neretușate, pentru credibilitate.`;
+  const petition = `Către: ${late ? late.p.authority : 'autoritățile competente'}
+
+Cerem oprirea definitivă a ${c.threat === 'taiere' ? 'tăierilor' : 'distrugerilor'} din ${where}, tragerea la răspundere a celor vinovați și refacerea zonei. ${val ? `Aici trăiesc ${sp}.` : ''}${late ? `\n\nSesizarea Agent Green a rămas fără răspuns peste termenul legal.` : ''}`;
+  return { press, social, video, petition };
+}
+
+/* ---------- Rapoarte ---------- */
+function annualHTML(){
+  const s = stats(), y = new Date().getFullYear(), is = instStats();
+  const bar = Object.entries(OUT).map(([k, v]) => `<tr><td>${v[0]}</td><td>${s.out[k]}</td></tr>`).join('');
+  return `${lhHTML(null, 'Raport de impact')}<h4>RAPORT DE IMPACT ${y}</h4><p class="sub">Generat automat din platforma de teren — include toate rezultatele, nu doar victoriile</p>
+  <div class="kpis"><div><b>${s.investigations}</b>investigații documentate</div><div><b>${s.stopped}</b>amenințări oprite pe teren</div><div><b>${f1(s.haProtected)}</b>ha unde distrugerea s-a oprit</div>
+  <div><b>${s.openJud}</b>procese și dosare penale în curs</div><div><b>${fmtDur(s.maxAge)}</b>cel mai vechi dosar activ</div><div><b>${s.wonCourt}</b>hotărâri definitive câștigate</div></div>
+  <p><b>Ceasul din teren.</b> Din ${s.n} cazuri, în ${s.stopped} activitatea s-a oprit pe teren${s.median != null ? `, de regulă în ${zile(s.median)} de la constatare` : ''}. În ${s.active} cazuri, distrugerea continuă.</p>
+  <p><b>Ceasul juridic.</b> Durata medie a procedurilor judiciare în curs este de ${fmtDur(s.avgAge)}.</p>
+  <table><thead><tr><th>Rezultat juridic</th><th>Cazuri</th></tr></thead><tbody>${bar}</tbody></table>
+  <p><b>Răspunsul instituțiilor.</b></p><table><thead><tr><th>Instituție</th><th>Sesizări</th><th>Răspuns în termen</th><th>Fără răspuns</th></tr></thead><tbody>${is.insts.map(i => `<tr><td>${esc(i.inst)}</td><td>${i.n}</td><td>${Math.round(i.pctInTerm * 100)}%</td><td>${Math.round(i.pctNever * 100)}%</td></tr>`).join('')}</tbody></table>
+  <p><b>Definiții.</b> „Oprit pe teren” = activitatea a încetat, confirmat de echipă. „Câștigat” = hotărâre definitivă favorabilă. „Hectare unde distrugerea s-a oprit” = suprafața cazurilor oprite pe teren sau rezolvate. Fiecare cifră se poate verifica pe lista de cazuri din platformă.</p>
+  <div class="foot">Cifrele din această versiune sunt demonstrative.</div>`;
+}
+function inactionHTML(){
+  const is = instStats(), worst = is.insts[0];
+  return `${lhHTML(null, 'Raport de inacțiune instituțională')}<h4>RAPORT DE INACȚIUNE INSTITUȚIONALĂ</h4><p class="sub">Pentru Comisia Europeană, presă și advocacy · generat ${fmtD(now())}</p>
+  <p>Asociația Agent Green urmărește fiecare sesizare și fiecare dosar până la soluționare. Datele de mai jos arată cum răspund autoritățile române la sesizările privind ariile naturale protejate.</p>
+  <table><thead><tr><th>Instituție</th><th>Sesizări</th><th>În termen</th><th>Cu întârziere</th><th>Niciun răspuns</th><th>Mediana (zile)</th></tr></thead><tbody>${is.insts.map(i => `<tr><td>${esc(i.inst)}</td><td>${i.n}</td><td>${i.inTerm}</td><td>${i.late}</td><td>${i.never}</td><td>${i.median ?? '—'}</td></tr>`).join('')}</tbody></table>
+  ${worst ? `<p><b>${esc(worst.inst)}</b> nu a răspuns deloc la ${Math.round(worst.pctNever * 100)}% din sesizări, deși termenul legal este de 30 de zile (OG nr. 27/2002).</p>` : ''}
+  <p><b>Dosare penale.</b> Din ${is.par.n} plângeri penale urmărite: ${is.par.clasat} clasate, ${is.par.prescris} prescrise, ${is.par.judecata} trimise în judecată, ${is.par.urmarire} încă în urmărire penală. Durata medie: ${f1(is.par.avgYears)} ani. Cel mai lung interval fără nicio mișcare într-un dosar: ${is.par.maxIdle} luni.</p>
+  <p>Aceste date susțin concluzia că remediile naționale nu asigură o protecție efectivă a siturilor Natura 2000, în sensul obligațiilor din Directiva 92/43/CEE.</p>
+  <div class="foot">Date demonstrative în această versiune. În produs, raportul se generează din dosarele reale ale asociației și poate fi anexat plângerilor la Comisia Europeană.</div>`;
+}
+function partnerReportHTML(pt){
+  const from = now() - 92 * DAY, cs = state.cases.filter(c => c.camps.includes(pt.camp)), s = stats(cs);
+  const evs = cs.flatMap(c => (c.procs || []).flatMap(p => p.events.filter(e => e.ts >= from && e.ts <= now()).map(e => ({ c, p, e })))).sort((a, b) => b.e.ts - a.e.ts);
+  const newC = cs.filter(c => c.created >= from);
+  return `${lhHTML(null, 'Raport pentru parteneri')}<h4>RAPORT TRIMESTRIAL</h4><p class="sub">${esc(pt.name)} · ${esc(pt.tier)} · campania ${esc(campName(pt.camp))}<br>${fmtD(from)} – ${fmtD(now())}</p>
+  <p>Mulțumim pentru sprijin. Raportul arată ce s-a întâmplat concret în campania susținută în ultimele trei luni, inclusiv ce nu a mers.</p>
+  <div class="kpis"><div><b>${newC.length}</b>cazuri noi documentate</div><div><b>${evs.length}</b>pași procedurali</div><div><b>${s.stopped}</b>amenințări oprite pe teren (total)</div></div>
+  <p><b>Activitate în trimestru</b></p><table><thead><tr><th>Data</th><th>Caz</th><th>Ce s-a întâmplat</th></tr></thead><tbody>${evs.slice(0, 12).map(x => `<tr><td>${fmtDs(x.e.ts)}</td><td>${esc(x.c.title)}</td><td>${EV[x.e.type].label}${x.e.note ? ' — ' + esc(x.e.note) : ''}</td></tr>`).join('') || '<tr><td colspan="3">Nicio mișcare procedurală în acest trimestru.</td></tr>'}</tbody></table>
+  <p><b>Situația cazurilor din campanie</b></p><table><thead><tr><th>Caz</th><th>Pe teren</th><th>Juridic</th></tr></thead><tbody>${cs.map(c => `<tr><td>${esc(c.title)}</td><td>${FIELD[c.field.status][0]}</td><td>${OUT[legalOutcome(c)][0]}${legalAge(c) > 180 * DAY ? ' · ' + fmtDur(legalAge(c)) : ''}</td></tr>`).join('')}</tbody></table>
+  <p><b>Unde au mers banii.</b> <span class="todo">[Se completează din contabilitate: deplasări, expertize, taxe judiciare.]</span></p>
+  <div class="foot">Raport generat automat din platforma Agent Green. Date demonstrative în această versiune.</div>`;
+}
+
+/* ---------- Randare ---------- */
+function clearMaps(){ maps.forEach(m => { try { m.remove(); } catch (e) {} }); maps = []; }
+function tabsHTML(){
+  const crit = state.cases.flatMap(oursOpen).filter(d => d.left >= 0 && d.left <= 30).length;
+  const newR = state.reports.filter(r => r.status === 'nou').length;
+  const T = state.role === 'team'
+    ? [['home','Acasă','home', crit], ['cases','Cazuri','list'], ['new','Caz nou','plus', 0, true], ['reports','Raportări','inbox', newR], ['impact','Impact','map']]
+    : [['vreport','Raportează','camera'], ['vmine','Ale mele','list'], ['impact','Hartă','map']];
+  return T.map(([v, l, i, n, plus]) => `<button class="tab ${plus ? 'plus' : ''} ${state.view === v || (v === 'cases' && state.view === 'case') ? 'on' : ''}" data-act="view" data-v="${v}">${plus ? `<span class="c">${svg(i)}</span>` : svg(i)}${n ? `<span class="dot">${n}</span>` : ''}${l}</button>`).join('');
+}
+function render(){
+  clearMaps();
+  $('#tabs').innerHTML = tabsHTML();
+  $('#r-team').classList.toggle('on', state.role === 'team'); $('#r-vol').classList.toggle('on', state.role === 'vol');
+  $('#subtitle').textContent = state.role === 'team' ? 'Platforma de protecție a naturii' : 'Ochi în teren · raportează';
+  const V = { home:viewHome, cases:viewCases, case:viewCase, new:viewNew, reports:viewReports, impact:viewImpact, vreport:viewVReport, vmine:viewVMine }[state.view] || viewHome;
+  $('#app').innerHTML = V();
+  after(); window.scrollTo(0, 0);
+}
+const tbadge = (t, size) => `<div class="tbadge" style="background:${THREATS[t].color};${size ? `width:${size}px;height:${size}px` : ''}">${svg(THREATS[t].icon)}</div>`;
+function casePills(c){
+  const d = oursOpen(c).find(x => x.left >= 0);
+  if (d && d.left <= 30) return `<span class="pill danger">Termen: ${zile(d.left)}</span>`;
+  const o = OUT[legalOutcome(c)];
+  return `<span class="pill ${o[1]}">${o[0]}</span>`;
+}
+function caseCard(c){
+  const age = legalAge(c), f = FIELD[c.field.status];
+  return `<button class="card case" style="width:100%;text-align:left;cursor:pointer" data-act="open" data-id="${c.id}">
+    <div class="row top">${tbadge(c.threat)}<div style="flex:1;min-width:0"><div class="top"><span class="code">${c.code}${c.source === 'voluntar' ? ' · voluntar' : ''}</span>${casePills(c)}</div>
+    <div style="font-weight:700;margin:4px 0 4px;line-height:1.3">${esc(c.title)}</div>
+    <div class="row" style="gap:6px;flex-wrap:wrap"><span class="pill ${f[1]}">${f[0]}</span>${age > 30 * DAY ? `<span class="pill">${svg('hourglass', 'ico', 2).replace('class="ico"', 'class="ico" style="width:12px;height:12px"')} ${fmtDur(age)}</span>` : ''}</div></div></div></button>`;
+}
+
+/* --- Acasă --- */
+function viewHome(){
+  const crit = state.cases.flatMap(oursOpen).sort((a, b) => a.due - b.due);
+  const critSoon = crit.filter(d => d.left >= 0 && d.left <= 30), missed = crit.filter(d => d.left < 0 && d.left > -90);
+  const presc = state.cases.map(c => ({ c, p:prescription(c) })).filter(x => x.p && !x.p.closed && x.p.hasPenal && x.p.leftGen > 0 && x.p.leftGen < 18 * 30.44 * DAY).sort((a, b) => a.p.leftGen - b.p.leftGen);
+  const late = state.cases.flatMap(theirsLate).sort((a, b) => a.left - b.left);
+  const hear = state.cases.map(c => ({ c, h:nextHearing(c) })).filter(x => x.h && x.h.e.ts - now() < 60 * DAY).sort((a, b) => a.h.e.ts - b.h.e.ts);
+  const newR = state.reports.filter(r => r.status === 'nou').sort((a, b) => b.ts - a.ts);
+  const row = (c, title, sub, pill, step = 5) => `<button class="item" data-act="open" data-id="${c.id}" data-step="${step}">${tbadge(c.threat)}<div style="flex:1;min-width:0"><div class="t">${title}</div><div class="muted xs">${sub}</div></div>${pill}</button>`;
+  return `
+  <div class="hero"><h1>Bună seara, echipa</h1><p class="muted small">Termenele care pot pierde un caz, primele. Restul pot aștepta.</p></div>
+  <div class="grid2" style="margin-bottom:10px">
+    <button class="tile danger" data-act="seg-cases" data-s="critical"><div class="n">${critSoon.length}</div><div class="l">termene ale noastre în următoarele 30 de zile</div></button>
+    <button class="tile warn" data-act="view" data-v="cases"><div class="n">${presc.length}</div><div class="l">dosare cu prescripția sub 18 luni</div></button>
+    <button class="tile info" data-act="impact-seg" data-s="institutii"><div class="n">${late.length}</div><div class="l">instituții în întârziere cu răspunsul</div></button>
+    <button class="tile" data-act="view" data-v="reports"><div class="n">${newR.length}</div><div class="l">raportări noi din teren</div></button>
+  </div>
+  <div class="sec">Nu rata · termenele voastre</div>
+  <div class="card">${critSoon.length || missed.length ? [...missed.map(d => row(d.c, esc(d.rule.label), `${esc(d.c.title)} · ${esc(d.rule.basis)}`, `<span class="pill danger">Ratat</span>`)), ...critSoon.map(d => row(d.c, esc(d.rule.label), `${esc(d.c.title)} · până la ${fmtD(d.due)}`, `<span class="pill ${d.left <= 7 ? 'danger' : 'warn'}">${zile(d.left)}</span>`))].join('')
+    : '<p class="muted small" style="margin:0">Niciun termen al vostru în următoarele 30 de zile.</p>'}</div>
+  ${presc.length ? `<div class="sec">Prescripție aproape</div><div class="card">${presc.map(x => row(x.c, esc(x.c.title), `termen general ${fmtD(x.p.general)} · încadrare de validat`, `<span class="pill warn">${fmtDur(x.p.leftGen)}</span>`)).join('')}</div>` : ''}
+  ${hear.length ? `<div class="sec">Termene de judecată</div><div class="card">${hear.map(x => row(x.c, esc(x.c.title), `${esc(x.h.p.authority)} · ${fmtD(x.h.e.ts)}${x.h.e.note ? ' · ' + esc(x.h.e.note) : ''}`, `<span class="pill info">${zile(Math.ceil((x.h.e.ts - now()) / DAY))}</span>`)).join('')}</div>` : ''}
+  <div class="sec">Instituții care nu au răspuns</div>
+  <div class="card">${late.length ? late.map(d => row(d.c, esc(d.p.authority), `${esc(d.rule.label)} · ${esc(d.c.title)}`, `<span class="pill danger">+${zile(-d.left)}</span>`)).join('') : '<p class="muted small" style="margin:0">Toate instituțiile sunt în termen.</p>'}</div>
+  <div class="sec">Raportări noi din teren</div>
+  <div class="card">${newR.slice(0, 3).map(r => `<button class="item" data-act="view" data-v="reports"><div class="thumb" style="width:44px;height:44px"><img src="${r.thumb}" alt=""></div><div style="flex:1;min-width:0"><div class="t" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(r.desc)}</div><div class="muted xs">${THREATS[r.threat].label} · ${esc(r.reporter)} · ${ago(r.ts)}</div></div></button>`).join('') || '<p class="muted small" style="margin:0">Nicio raportare nouă.</p>'}</div>
+  <div class="sec">Date</div>
+  <div class="card"><div class="row top">${svg('map')}<div style="flex:1"><div class="b small">Limitele ariilor protejate</div>
+    <p class="muted xs" style="margin:2px 0 8px">${CUSTOM ? `${CUSTOM.zones.length} arii încărcate din ${CUSTOM.files.map(esc).join(', ')}. Verificarea zonei folosește aceste date.` : 'Acum: limite aproximative pentru Retezat (demo). Încarcă setul publicat de Agent Green (proiectul „Digitalizare Granițe Arii Protejate”) în format KMZ, KML, GeoJSON sau SHP arhivat.'}</p>
+    <label class="btn sm">${svg('upload')} Încarcă fișier<input type="file" accept=".kmz,.kml,.geojson,.json,.zip" hidden data-change="bounds"></label></div></div></div>
+  <div class="card flat info small"><b>Concept demo.</b> Termenele procedurale sunt implementate după textul legii (art. 339–340 C.proc.pen., art. 154–155 C.pen., Legea nr. 554/2004, OG nr. 27/2002, Legea nr. 544/2001) și trebuie validate cu un jurist. Cazurile, instituțiile și cifrele sunt demonstrative.</div>
+  <button class="btn sm ghost block" data-act="reset">Resetează datele demo</button>`;
+}
+
+/* --- Cazuri --- */
+function viewCases(){
+  let cs = [...state.cases].sort((a, b) => b.created - a.created);
+  let title = 'Cazuri';
+  if (state.subset) { cs = cs.filter(c => state.subset.ids.includes(c.id)); title = state.subset.label; }
+  if (state.filter !== 'all') cs = cs.filter(c => c.threat === state.filter);
+  if (state.seg === 'critical') cs = cs.filter(c => oursOpen(c).some(d => d.left >= 0 && d.left <= 30)).sort((a, b) => oursOpen(a)[0].due - oursOpen(b)[0].due);
+  if (state.seg === 'old') cs = cs.filter(c => legalAge(c) > 2 * YEAR).sort((a, b) => legalAge(b) - legalAge(a));
+  return `<div class="hero"><h1>${esc(title)}</h1>${state.subset ? `<button class="btn sm ghost" data-act="clear-subset">✕ Toate cazurile</button>` : ''}</div>
+  <div class="seg s3"><button class="${state.seg === 'all' ? 'on' : ''}" data-act="seg" data-s="all">Toate</button><button class="${state.seg === 'critical' ? 'on' : ''}" data-act="seg" data-s="critical">Termene critice</button><button class="${state.seg === 'old' ? 'on' : ''}" data-act="seg" data-s="old">Peste 2 ani</button></div>
+  <div class="chips"><button class="chip ${state.filter === 'all' ? 'on' : ''}" data-act="filter" data-f="all">Toate tipurile</button>${Object.entries(THREATS).map(([k, t]) => `<button class="chip ${state.filter === k ? 'on' : ''}" data-act="filter" data-f="${k}">${t.label.split(' / ')[0]}</button>`).join('')}</div>
+  ${cs.map(caseCard).join('') || '<div class="card flat"><p class="muted small" style="margin:0">Niciun caz în această categorie.</p></div>'}`;
+}
+function viewNew(){
+  return `<div class="hero"><h1>Caz nou</h1><p class="muted small">Tipul decide ce verifică aplicația, cui se adresează documentele și în ce campanie intră cazul.</p></div>
+  <div class="tgrid">${Object.entries(THREATS).map(([k, t]) => `<button class="tpick" data-act="create" data-t="${k}">${tbadge(k)}<span>${t.label}</span></button>`).join('')}</div>`;
+}
+
+/* --- Caz --- */
+function viewCase(){
+  const c = cur(); if (!c) return viewCases();
+  const body = [stepEvidence, stepZone, stepAnalysis, stepChecks, stepDossier, stepLegal, stepCampaign][state.step](c);
+  return `
+  <div class="backrow"><button class="btn sm ghost" data-act="view" data-v="cases">‹ Cazuri</button><div class="spacer"></div>${casePills(c)}</div>
+  <div class="row" style="margin:6px 0 2px">${tbadge(c.threat)}<div style="flex:1;min-width:0"><div class="code">${c.code} · ${THREATS[c.threat].label}</div>
+  <textarea class="in" rows="2" style="font-weight:700;font-size:17px;line-height:1.25;border-color:transparent;background:transparent;padding:2px 0;min-height:0;resize:none" data-field="title" aria-label="Titlul cazului">${esc(c.title)}</textarea></div></div>
+  <div class="stepper">${STEPS.map((s, i) => `<button class="step ${i === state.step ? 'cur' : ''} ${c.done.includes(i) ? 'done' : ''}" data-act="step" data-i="${i}"><b>${c.done.includes(i) && i !== state.step ? '✓' : i + 1}</b>${s}</button>`).join('')}</div>
+  ${body}
+  <div class="navrow"><button class="btn" data-act="prev" ${state.step === 0 ? 'disabled' : ''}>‹ Înapoi</button>${state.step < 6 ? `<button class="btn primary" data-act="next">Continuă ›</button>` : `<button class="btn primary" data-act="view" data-v="cases">Gata</button>`}</div>
+  <div class="card flat" style="margin-top:14px"><h3>Lanț de custodie și istoric</h3><div class="log">${[...c.log].sort((a, b) => b.ts - a.ts).map(l => `<div>${fmtDT(l.ts)} — ${esc(l.msg)}</div>`).join('')}</div></div>`;
+}
+const needLoc = () => `<div class="card flat"><p class="small" style="margin:0">Mai întâi stabilește locația la pasul <b>Zonă</b>.</p></div>`;
+function evidenceList(list){
+  return list.map(e => `<div class="ev"><div class="thumb">${e.thumb ? `<img src="${e.thumb}" alt="">` : svg('film')}</div><div style="min-width:0;flex:1"><div class="small" style="font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(e.name)}${e.demo ? ' <span class="muted xs">(demo)</span>' : ''}</div>
+    <div class="muted xs">${fmtDT(e.ts)} · ${e.lat != null ? `${fx(e.lat)}, ${fx(e.lng)} ±${Math.round(e.acc)} m` : 'fără GPS'}</div><div class="hash">SHA-256 ${e.hash}</div></div></div>`).join('');
+}
+function estHTML(est, T){ const probe = T.estimate({ q:{ stumps:1, diam:1, area:1, ha:1 } }); return `<div class="muted xs" style="font-weight:600">${est ? est.label : (probe ? probe.label : 'ESTIMARE')}</div><div class="metric">${est ? f1(est.v) : '—'}<small>${est ? est.unit : (probe ? probe.unit : '')}</small></div><div class="muted xs">${est ? est.note : 'Completează câmpurile de mai sus.'}</div>`; }
+function stepEvidence(c){
+  const T = THREATS[c.threat], fix = state.lastFix, est = T.estimate ? T.estimate(c) : null;
+  return `
+  <div class="card"><div class="row"><div style="flex:1"><h3 style="margin:0">GPS</h3><div class="muted small">${fix ? `${fx(fix.lat)}, ${fx(fix.lng)} · ±${Math.round(fix.acc)} m` : 'Nepornit — fiecare probă primește coordonatele de la momentul capturii.'}</div></div>
+    <button class="btn sm ${fix ? '' : 'primary'}" data-act="gps">${fix ? 'Reîmprospătează' : 'Pornește GPS'}</button></div></div>
+  <label class="btn primary block" style="padding:16px">${svg('camera')} Fotografiază / filmează proba<input type="file" accept="image/*,video/*" capture="environment" multiple hidden data-change="capture"></label>
+  <p class="muted xs" style="margin:6px 2px 12px">Fiecare fișier primește pe loc amprentă SHA-256, ora exactă și coordonatele GPS. Originalele se arhivează: peste cinci ani, la a zecea înfățișare, proba e aceeași.</p>
+  <div class="card"><div class="row" style="margin-bottom:4px"><h3 style="margin:0;flex:1">Probe (${c.evidence.length})</h3>${c.evidence.length ? `<span class="pill ${navigator.onLine ? 'ok' : 'warn'}">${navigator.onLine ? 'Arhivate ✓' : 'În coadă offline'}</span>` : ''}</div>
+    ${c.evidence.length ? evidenceList(c.evidence) : '<p class="muted small" style="margin:6px 0 0">Nicio probă încă.</p>'}</div>
+  <div class="card"><h3>Constatare</h3>
+    <label class="f">Ce ai găsit</label><select class="in" data-field="finding">${Object.entries(T.findings).map(([k, v]) => `<option value="${k}" ${c.finding === k ? 'selected' : ''}>${v[0]}</option>`).join('')}</select>
+    <div class="grid2"><div><label class="f">Data faptei</label><input class="in" type="date" data-field="dateFapta" value="${dateInputVal(c.dateFapta || c.created)}"></div><div><label class="f">Suprafață amenințată (ha)</label><input class="in" type="number" inputmode="decimal" min="0" step="0.1" data-field="ha" value="${esc(c.ha)}" placeholder="ex. 3,4"></div></div>
+    ${T.qty.length ? `<div class="grid2">${T.qty.map(q => `<div><label class="f">${q.label}</label><input class="in" ${q.text ? 'type="text"' : 'type="number" inputmode="numeric" min="0"'} data-q="${q.k}" value="${esc(c.q[q.k] ?? '')}" placeholder="ex. ${q.ph}"></div>`).join('')}</div>` : ''}
+    ${T.estimate ? `<div class="card flat ok" style="margin:12px 0 0" id="estbox">${estHTML(est, T)}</div>` : ''}
+    <label class="f">Observații de teren</label><textarea class="in" data-field="notes" placeholder="Ce ai observat, urme, direcții, persoane, utilaje…">${esc(c.notes)}</textarea></div>`;
+}
+function stepZone(c){
+  const z = zoneOf(c), val = valueOf(z), cls = !z ? '' : z.level === 'strict' ? 'danger' : z.level === 'park' ? 'warn' : '';
+  return `
+  <div id="zmap" class="mapbox"></div>
+  <div class="legend"><span><i style="background:#e0a10055;border:1px solid #e0a100"></i>Parc / arie protejată</span><span><i style="background:#d92d2055;border:1px solid #d92d20"></i>Protecție strictă</span><span class="xs">${CUSTOM ? 'Date Agent Green' : 'Limite aproximative (demo)'}</span></div>
+  <div class="grid2" style="margin-bottom:10px"><button class="btn sm" data-act="loc-gps">Locația mea</button><button class="btn sm" data-act="loc-ev" ${c.evidence.some(e => e.lat != null) ? '' : 'disabled'}>Poziția probelor</button></div>
+  <button class="btn sm block ghost" data-act="loc-demo" style="margin-bottom:12px">Simulează un punct în Retezat (pentru prezentare)</button>
+  ${z ? `<div class="card ${cls}"><div class="muted xs" style="font-weight:700;letter-spacing:.04em">${z.level === 'strict' ? 'ATENȚIE — ZONĂ DE PROTECȚIE STRICTĂ' : z.level === 'park' ? 'ARIE NATURALĂ PROTEJATĂ' : 'REZULTAT'}</div>
+    <h2 style="margin:4px 0 6px">${esc(z.name)}</h2>${z.park && z.park !== z.name ? `<p class="small" style="margin:0 0 6px">în ${esc(z.park)}</p>` : ''}<p class="small" style="margin:0">${esc(z.regime)}</p></div>
+  ${val ? `<div class="card"><div class="row" style="margin-bottom:6px"><h3 style="margin:0;flex:1">Ce e în joc aici</h3><span class="pill ${val.score === 'Excepțională' ? 'danger' : 'warn'}">Valoare ${val.score.toLowerCase()}</span></div>
+    ${val.extra.length ? `<p class="small" style="margin:0 0 8px"><b>${val.extra.join(' · ')}</b></p>` : ''}
+    <div class="muted xs" style="font-weight:700">HABITATE NATURA 2000</div><div class="taglist" style="margin-bottom:10px">${val.habitats.map(h => `<span>${h}</span>`).join('')}</div>
+    <div class="muted xs" style="font-weight:700">SPECII PROTEJATE</div><div class="taglist">${val.species.map(h => `<span>${h}</span>`).join('')}</div>
+    <p class="muted xs" style="margin:10px 0 0">Valori orientative pentru demo. În produs, din formularele standard Natura 2000.</p></div>` : ''}
+  <div class="card"><h3>Campanii Agent Green</h3><p class="muted xs" style="margin:0 0 8px">Cazul alimentează pagina campaniei, rapoartele pentru parteneri și cifrele publice.</p>
+    <div class="chips wrap">${CAMPAIGNS.map(k => `<button class="chip ${c.camps.includes(k.id) ? 'on' : ''}" data-act="tagcamp" data-k="${k.id}">${k.name}</button>`).join('')}</div></div>
+  <dl class="kv card flat"><dt>Coordonate</dt><dd>${fx(c.loc.lat)}, ${fx(c.loc.lng)}</dd><dt>Precizie</dt><dd>±${Math.round(c.loc.acc || 0)} m</dd><dt>Sursă</dt><dd>${esc(c.loc.source)}</dd></dl>`
+  : `<div class="card flat"><p class="small muted" style="margin:0">Alege o sursă de localizare sau atinge harta.</p></div>`}`;
+}
+function stepAnalysis(c){
+  if (!c.loc) return needLoc();
+  const T = THREATS[c.threat], nb = nearby(c);
+  let sat = '';
+  if (T.sat) {
+    const sd = satData(c), t = tileFor(c.loc.lat, c.loc.lng, 16), img = `https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/${t.z}/${t.y}/${t.x}`;
+    const overlay = { forest:`<path d="M38 30 L64 27 L72 46 L66 66 L44 70 L33 52 Z" fill="#a8743f" opacity=".72" stroke="#ffcf8a" stroke-width=".6"/><path d="M66 66 Q78 78 96 84" stroke="#c9a27a" stroke-width="1.6" fill="none" opacity=".9"/>`,
+      works:`<rect x="40" y="38" width="26" height="18" fill="#9aa0a6" opacity=".85" stroke="#fff" stroke-width=".5"/><path d="M53 56 Q55 75 92 90" stroke="#c9b9a0" stroke-width="2.2" fill="none"/>`,
+      river:`<path d="M0 46 Q30 38 50 52 T100 48 L100 60 Q70 64 50 64 T0 60Z" fill="#b39468" opacity=".8"/><circle cx="62" cy="50" r="3" fill="#e0a100"/>` }[T.sat];
+    sat = `<div class="card flat warn small"><b>Simulare.</b> Imaginea de bază e reală (Esri World Imagery). Detecția schimbării și graficul sunt simulate. În produs: Sentinel-2 și alertele Global Forest Watch.</div>
+    <div class="ba"><img src="${img}" alt="Imagine satelitară" referrerpolicy="no-referrer"><div class="after" id="baafter"><img src="${img}" alt="" referrerpolicy="no-referrer" style="filter:saturate(.6) brightness(1.05)"><svg viewBox="0 0 100 100" preserveAspectRatio="none" style="position:absolute;inset:0;width:100%;height:100%">${overlay}</svg></div>
+      <div class="divider" id="badiv" style="left:50%"></div><span class="tag" style="left:8px">ÎNAINTE · ${sd.months[0].toLocaleDateString('ro-RO', { month:'short', year:'numeric' })}</span><span class="tag" style="right:8px">DUPĂ · simulare</span></div>
+    <input type="range" min="0" max="100" value="50" data-input="ba" aria-label="Compară înainte și după">
+    <div class="grid2" style="margin:10px 0 12px"><div class="card flat" style="margin:0"><div class="muted xs" style="font-weight:600">${sd.river ? 'TURBIDITATE' : 'PIERDERE ESTIMATĂ'}</div><div class="metric">${sd.river ? '+' + Math.round((sd.vals[sd.vals.length - 1] / sd.vals[0] - 1) * 100) : f1(sd.ha)}<small>${sd.river ? '%' : 'ha'}</small></div></div>
+      <div class="card flat" style="margin:0"><div class="muted xs" style="font-weight:600">DETECTATĂ ÎN</div><div class="metric" style="font-size:17px;margin-top:6px">${fmtMY(sd.lossDate)}</div></div></div>
+    <div class="card"><h3>${sd.river ? 'Indice de turbiditate a apei' : 'Indice de vegetație (NDVI)'} în punct</h3>${chartSVG(sd)}</div>`;
+  } else sat = `<div class="card flat info small">Pentru acest tip de amenințare, analiza se bazează pe istoricul zonei.</div>`;
+  return `${sat}
+  <div class="card"><div class="row" style="margin-bottom:4px"><h3 style="margin:0;flex:1">Istoric în zonă · 5 km</h3><span class="pill ${nb.length >= 2 ? 'danger' : nb.length ? 'warn' : ''}">${nb.length}</span></div>
+    ${nb.length ? `<p class="small" style="margin:4px 0 6px">${nb.length >= 2 ? '<b>Problemă recurentă.</b> Istoricul susține cererea de măsuri permanente: pază, interdicție, protecție strictă.' : 'Există istoric în apropiere.'}</p>
+    ${nb.slice(0, 5).map(n => `<div class="ev">${tbadge(n.t, 30)}<div style="flex:1;min-width:0"><div class="small" style="font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(n.title)}</div><div class="muted xs">${n.kind === 'caz' ? 'Caz · ' + OUT[n.out][0] : 'Raportare voluntar'} · ${f1(n.d)} km · ${fmtDs(n.ts)}</div></div></div>`).join('')}` : '<p class="muted small" style="margin:4px 0 0">Nicio altă înregistrare în apropiere.</p>'}</div>`;
+}
+function stepChecks(c){
+  if (!c.loc) return needLoc();
+  const T = THREATS[c.threat], ch = checksFor(c);
+  return `<div class="card flat warn small"><b>Date demonstrative.</b> În produs: registrele publice (SUMAL 2.0 / Inspectorul Pădurii, acte de reglementare), în măsura în care permit. Ce nu e public se cere prin Legea nr. 544/2001.</div>
+  ${ch.cards.map(k => `<div class="card ${k.cls}"><div class="muted xs" style="font-weight:700">${k.label}</div><div class="metric">${k.v}<small>${k.unit}</small></div><p class="small" style="margin:0">${k.txt}</p></div>`).join('')}
+  ${ch.list ? `<div class="card"><h3>${ch.list.title}</h3>${ch.list.items.map(([a, b]) => `<div class="ev"><div class="thumb" style="width:40px;height:40px">${svg(ch.list.icon)}</div><div style="flex:1"><div class="small" style="font-weight:600">${a}</div><div class="muted xs">${b}</div></div></div>`).join('')}</div>` : ''}
+  ${T.link ? `<a class="btn block" href="${T.link.href}" target="_blank" rel="noopener">${T.link.label} ↗</a>` : ''}
+  <div class="card flat" style="margin-top:12px"><label class="check"><input type="checkbox" data-field="manualCheck" ${c.manualCheck ? 'checked' : ''}> Am verificat manual datele publice. Mențiunea intră în dosar.</label></div>`;
+}
+function stepDossier(c){
+  if (!c.loc) return needLoc();
+  const T = THREATS[c.threat];
+  if (!state.docType || !T.recipients.includes(state.docType)) state.docType = T.recipients[0];
+  const rk = state.docType, filed = (c.procs || []).flatMap(p => p.events.filter(e => e.rk === rk));
+  return `<div class="seg">${T.recipients.map(k => `<button class="${rk === k ? 'on' : ''}" data-act="doctype" data-k="${k}">${RECIP[k].label}<br><span class="muted xs">${RECIP[k].sub}${(c.procs || []).some(p => p.events.some(e => e.rk === k)) ? ' · depus ✓' : ''}</span></button>`).join('')}</div>
+  <div class="card flat ok row" style="gap:12px">${svg('shield').replace('class="ico"', 'class="ico" style="width:28px;height:28px;color:var(--brand)"')}<div style="min-width:0"><div class="small" style="font-weight:700">Amprenta dosarului</div><div class="hash" id="fp">se calculează…</div></div></div>
+  <div class="doc" id="docprev">${docHTML(c, rk, '…')}</div>
+  <div class="grid3" style="margin-top:12px"><button class="btn sm" data-act="print">PDF</button><button class="btn sm" data-act="copydoc">Copiază</button><button class="btn sm" data-act="manifest">Manifest</button></div>
+  <div class="card" style="margin-top:12px"><h3>${filed.length ? 'Depus deja' : 'L-ai depus?'}</h3>
+    ${filed.map(e => `<p class="small" style="margin:0 0 6px">Nr. ${esc(e.regNo)} din ${fmtD(e.ts)}</p>`).join('')}
+    <p class="muted xs" style="margin:0 0 8px">Introdu numărul de înregistrare. Documentul intră în dosarul juridic, iar aplicația urmărește termenele care decurg din el, ani la rând.</p>
+    <div class="row"><input class="in" id="regno" placeholder="Nr. înregistrare" style="flex:1"><button class="btn primary" data-act="file">Marchează depus</button></div></div>`;
+}
+function recommendation(c){
+  const ours = oursOpen(c), d = ours.find(x => x.left >= 0), missed = ours.find(x => x.left < 0);
+  if (d) return { cls: d.left <= 7 ? 'danger' : 'warn', title:`Ai ${zile(d.left)}: ${d.rule.label.toLowerCase()}`, text:`${d.rule.basis}. Termenul e al vostru: dacă trece, calea de atac se pierde.${d.rule.validate ? ' Termen de validat cu juristul.' : ''}`, act: d.rule.doc ? { a:'ldoc', kind:d.rule.doc, p:d.p.id, e:d.e.id, label:'Pregătește documentul' } : null };
+  if (missed) return { cls:'danger', title:`Termen ratat: ${missed.rule.label.toLowerCase()}`, text:`Termenul s-a împlinit pe ${fmtD(missed.due)}. Discută cu juristul dacă mai există o cale procedurală.`, act:null };
+  const pr = prescription(c), pen = (c.procs || []).find(p => p.kind === 'penal' && !isFinal(p));
+  if (pr && !pr.closed && pen && pr.leftGen > 0 && pr.leftGen < 18 * 30.44 * DAY) return { cls:'warn', title:`Prescripția generală se împlinește în ${fmtDur(pr.leftGen)}`, text:`Pe ${fmtD(pr.general)}, pentru încadrarea aleasă. Cere stadiul dosarului și solicită celeritate. Termenul special (${fmtD(pr.special)}) nu poate fi depășit, oricâte întreruperi ar fi.`, act:{ a:'ldoc', kind:'stadiu', p:pen.id, e:'', label:'Pregătește cererea' } };
+  const late = theirsLate(c)[0];
+  if (late) return { cls:'info', title:`${late.p.authority} e în întârziere cu ${zile(-late.left)}`, text:`Termenul instituției (${late.rule.basis}) a expirat. Nu pierdeți nimic, dar întârzierea intră în statisticile de inacțiune.${late.rule.doc ? ' Poți trimite o revenire.' : ''}`, act: late.rule.doc ? { a:'ldoc', kind:late.rule.doc, p:late.p.id, e:late.e.id, label:'Pregătește revenirea' } : null };
+  const idle = (c.procs || []).filter(p => p.kind === 'penal' && idleOf(p) > 180 * DAY)[0];
+  if (idle) return { cls:'warn', title:`Dosarul penal nu s-a mișcat de ${fmtDur(idleOf(idle))}`, text:'Cere stadiul dosarului. Inactivitatea lungă e și un semnal de risc pentru prescripție.', act:{ a:'ldoc', kind:'stadiu', p:idle.id, e:'', label:'Pregătește cererea' } };
+  if (!(c.procs || []).length) return { cls:'info', title:'Nicio procedură deschisă', text:'Generează primul document la pasul Documente și marchează-l ca depus.', act:{ a:'goto', step:4, label:'Mergi la Documente' } };
+  const h = nextHearing(c);
+  return { cls:'ok', title: h ? `Următorul termen de judecată: ${fmtD(h.e.ts)}` : 'Nimic urgent', text: h ? `${h.p.authority}${h.e.note ? ' · ' + h.e.note : ''}. Pregătirea dosarului de înfățișare e la un clic.` : 'Aplicația te anunță la orice termen nou.', act:null };
+}
+function timelineHTML(p){
+  const evs = sortedEv(p); let html = '', prev = null;
+  evs.forEach(e => {
+    if (prev && e.ts - prev.ts > 180 * DAY && prev.ts <= now()) html += `<div class="gap">${fmtDur(Math.min(e.ts, now()) - prev.ts)} fără nicio mișcare</div>`;
+    const fut = e.ts > now(), bad = EV[e.type].bad || e.win === false, win = e.win === true;
+    html += `<div class="e ${fut ? 'fut' : ''} ${bad ? 'bad' : ''} ${win ? 'win' : ''}"><div class="d">${fmtD(e.ts)}${fut ? ' · programat' : ''}</div><div class="t">${EV[e.type].label}${e.win === true ? ' · favorabil' : e.win === false ? ' · nefavorabil' : ''}</div>${e.note || e.regNo ? `<div class="muted xs">${esc(e.note || '')}${e.note && e.regNo ? ' · ' : ''}${e.regNo ? 'nr. ' + esc(e.regNo) : ''}</div>` : ''}</div>`;
+    prev = e;
+  });
+  const idle = idleOf(p); if (idle > 180 * DAY) html += `<div class="gap">De ${fmtDur(idle)} fără nicio mișcare, până azi</div>`;
+  return `<div class="tl">${html}</div>`;
+}
+function stepLegal(c){
+  const rec = recommendation(c), pr = prescription(c), age = legalAge(c), fd = fieldDays(c), out = OUT[legalOutcome(c)];
+  const ours = oursOpen(c), late = theirsLate(c);
+  const ld = state.legalDoc; const ldp = ld && (c.procs || []).find(p => p.id === ld.p); const lde = ldp && ldp.events.find(e => e.id === ld.e);
+  return `
+  <div class="clocks">
+    <div class="clock"><div class="k">CEASUL DIN TEREN</div><div class="v" style="color:var(--${FIELD[c.field.status][1] === 'ok' ? 'brand' : FIELD[c.field.status][1] === 'danger' ? 'danger' : 'muted'})">${c.field.status === 'oprit' ? (fd != null ? `Oprit după ${zile(fd)}` : 'Oprit') : FIELD[c.field.status][0]}</div>
+      <select class="in" style="padding:6px 8px;font-size:13px;margin-top:6px" data-field="fieldStatus">${Object.entries(FIELD).map(([k, v]) => `<option value="${k}" ${c.field.status === k ? 'selected' : ''}>${v[0]}</option>`).join('')}</select>
+      ${c.field.status === 'oprit' ? `<input class="in" type="date" style="padding:6px 8px;font-size:13px;margin-top:6px" data-field="fieldAt" value="${dateInputVal(c.field.at || now())}">` : ''}</div>
+    <div class="clock"><div class="k">CEASUL JURIDIC</div><div class="v">${(c.procs || []).length ? fmtDur(age) : '—'}</div><div class="muted xs">${(c.procs || []).length ? `${c.procs.length} ${c.procs.length === 1 ? 'procedură' : 'proceduri'} · <span class="pill ${out[1]}" style="padding:2px 7px">${out[0]}</span>` : 'nicio procedură'}</div></div>
+  </div>
+  <div class="card ${rec.cls}"><div class="row top" style="gap:10px">${svg('clock')}<div style="flex:1"><h3 style="margin:0 0 4px">${esc(rec.title)}</h3><p class="small" style="margin:0 0 ${rec.act ? 10 : 0}px">${esc(rec.text)}</p>
+    ${rec.act ? `<button class="btn sm ${rec.cls === 'danger' ? 'danger' : 'primary'}" data-act="rec" data-a="${rec.act.a}" data-kind="${rec.act.kind || ''}" data-p="${rec.act.p || ''}" data-e="${rec.act.e || ''}" data-step="${rec.act.step ?? ''}">${rec.act.label}</button>` : ''}</div></div></div>
+  ${ld && ldp ? `<div class="card" id="ldocbox"><div class="row" style="margin-bottom:8px"><h3 style="margin:0;flex:1">${LDOC[ld.kind].title.charAt(0) + LDOC[ld.kind].title.slice(1).toLowerCase()} · ${esc(ldp.authority)}</h3><button class="btn sm ghost" data-act="ldoc-close">✕</button></div>
+    <div class="doc" id="ldprev">${legalDocHTML(c, ld.kind, ldp, lde, state.fingerprint || '…')}</div>
+    <div class="grid2" style="margin-top:10px"><button class="btn sm" data-act="ldoc-print">PDF</button><button class="btn sm" data-act="ldoc-copy">Copiază</button></div>
+    <div class="row" style="margin-top:10px"><input class="in" id="ldno" placeholder="Nr. înregistrare" style="flex:1"><button class="btn primary" data-act="ldoc-file">Depus</button></div></div>` : ''}
+  ${ours.length ? `<div class="sec">Termenele voastre</div><div class="card">${ours.map(d => `<div class="ev"><div style="flex:1"><div class="small b">${esc(d.rule.label)}</div><div class="muted xs">${esc(d.rule.basis)} · până la ${fmtD(d.due)}</div></div><span class="pill ${d.left < 0 ? 'danger' : d.left <= 7 ? 'danger' : 'warn'}">${d.left < 0 ? 'Ratat' : zile(d.left)}</span></div>`).join('')}</div>` : ''}
+  ${late.length ? `<div class="sec">Termenele instituțiilor, depășite</div><div class="card">${late.map(d => `<div class="ev"><div style="flex:1"><div class="small b">${esc(d.p.authority)}: ${esc(d.rule.label.toLowerCase())}</div><div class="muted xs">${esc(d.rule.basis)} · expirat ${fmtD(d.due)}</div></div><span class="pill danger">+${zile(-d.left)}</span></div>`).join('')}</div>` : ''}
+  ${pr && !pr.closed ? (() => { const span = pr.special - pr.f, pos = Math.min(100, Math.max(0, (now() - pr.f) / span * 100)), g = (pr.general - pr.f) / span * 100;
+    return `<div class="sec">Prescripția răspunderii penale</div><div class="card"><label class="f" style="margin-top:0">Pedeapsa maximă prevăzută (încadrare de validat cu juristul)</label>
+    <select class="in" data-field="penalty">${Object.entries(PENALTIES).map(([k, v]) => `<option value="${k}" ${c.legal.penalty === k ? 'selected' : ''}>${v.label} → ${v.y} ani</option>`).join('')}</select>
+    <div style="position:relative;height:14px;border-radius:7px;background:var(--surface-2);margin:14px 0 6px;overflow:hidden"><i style="position:absolute;left:0;top:0;bottom:0;width:${g}%;background:var(--warn-soft)"></i><i style="position:absolute;left:${g}%;top:0;bottom:0;right:0;background:var(--danger-soft)"></i><i style="position:absolute;left:calc(${pos}% - 1px);top:0;bottom:0;width:3px;background:var(--text)"></i></div>
+    <div class="row xs muted" style="justify-content:space-between"><span>Fapta · ${fmtDs(pr.f)}</span><span>General · ${fmtDs(pr.general)}</span><span>Special · ${fmtDs(pr.special)}</span></div>
+    <p class="small" style="margin:10px 0 0">${pr.leftGen > 0 ? `Termenul general se împlinește în <b>${fmtDur(pr.leftGen)}</b>.` : `Termenul general a trecut; dacă a fost întrerupt prin acte de procedură, mai curge până la termenul special (<b>${fmtDur(pr.leftSpec)}</b>).`}</p>
+    <p class="muted xs" style="margin:6px 0 0">Art. 154 C.pen.: termenul general după pedeapsa maximă. Art. 155 alin. (4): termenul special e dublul celui general, oricâte întreruperi ar fi. Practica privind întreruperea a fost afectată de decizii ale Curții Constituționale. De validat cu juristul.</p></div>`; })() : ''}
+  <div class="sec">Proceduri</div>
+  ${(c.procs || []).length ? c.procs.map(p => `<div class="card"><div class="row top" style="margin-bottom:4px"><div style="flex:1;min-width:0"><div class="b">${PROC_KIND[p.kind]} · ${esc(p.authority)}</div><div class="muted xs">${p.number ? 'nr. ' + esc(p.number) + ' · ' : ''}deschisă de ${fmtDur(now() - sortedEv(p)[0].ts)}</div></div>${isFinal(p) ? '<span class="pill">Închisă</span>' : '<span class="pill info">Activă</span>'}</div>
+    ${timelineHTML(p)}
+    <details class="add"><summary>+ Adaugă un pas</summary>
+      <select class="in" id="evt-${p.id}" style="margin-top:8px">${Object.entries(EV).filter(([k, v]) => v.k.includes(p.kind)).map(([k, v]) => `<option value="${k}">${v.label}</option>`).join('')}</select>
+      <div class="grid2" style="margin-top:8px"><input class="in" type="date" id="evd-${p.id}" value="${dateInputVal(now())}"><select class="in" id="evw-${p.id}"><option value="">Rezultat: —</option><option value="1">Favorabil</option><option value="0">Nefavorabil</option></select></div>
+      <input class="in" id="evn-${p.id}" placeholder="Notă / număr (opțional)" style="margin-top:8px">
+      <p class="muted xs" style="margin:6px 0 8px">Data comunicării contează: de la ea curg termenele de 20 sau 30 de zile.</p>
+      <button class="btn sm primary block" data-act="addev" data-p="${p.id}">Adaugă</button></details></div>`).join('') : '<div class="card flat"><p class="muted small" style="margin:0">Nicio procedură încă.</p></div>'}
+  <div class="sec">Responsabil</div>
+  <div class="card"><div class="row"><div style="flex:1"><div class="b small">${esc(c.legal.owner)}</div><div class="muted xs">${(c.legal.owners || []).length ? `${c.legal.owners.length} predări în istoric · ${c.legal.owners.map(o => esc(o.name.split(' ')[0])).join(' → ')}` : 'Fără predări'}</div></div></div>
+    <p class="muted xs" style="margin:8px 0">Dosarele durează mai mult decât stau oamenii în echipă. La predare, istoricul, termenele și probele rămân în caz.</p>
+    <div class="row"><input class="in" id="newowner" placeholder="Predă către…" style="flex:1"><button class="btn sm" data-act="handover">Predă</button></div></div>`;
+}
+function stepCampaign(c){
+  if (!c.loc) return needLoc();
+  const t = campaignTexts(c), sig = c.campaign.signatures || 0, goal = 10000;
+  const block = (k, ic, title, txt) => `<div class="card"><div class="row" style="margin-bottom:2px">${svg(ic)}<h3 style="margin:0;flex:1">${title}</h3><button class="btn sm" data-act="copycamp" data-k="${k}">Copiază</button></div><div class="gen">${esc(txt)}</div></div>`;
+  return `<div class="card flat info small">Textele se generează din datele cazului și spun adevărul despre stadiu: ce s-a oprit, ce durează, cine nu a răspuns. Campanii: ${c.camps.map(campName).join(', ') || '—'}.</div>
+  <div class="card"><div class="row" style="margin-bottom:8px">${svg('mega')}<h3 style="margin:0;flex:1">Petiție</h3><span class="pill ${c.campaign.published ? 'ok' : ''}">${c.campaign.published ? 'Publicată' : 'Ciornă'}</span></div>
+    <div class="gen">${esc(t.petition)}</div>
+    <div class="row" style="justify-content:space-between;margin:6px 0 4px"><b>${sig.toLocaleString('ro-RO')} semnături</b><span class="muted xs">țintă ${goal.toLocaleString('ro-RO')}</span></div><div class="bar"><i style="width:${Math.min(100, sig / goal * 100)}%"></i></div>
+    <div class="grid2" style="margin-top:10px">${c.campaign.published ? `<button class="btn sm" data-act="sign">+ Semnătură (demo)</button>` : `<button class="btn sm primary" data-act="publish">Publică petiția</button>`}<button class="btn sm" data-act="alert">Alertează voluntarii din 20 km</button></div></div>
+  ${block('press', 'doc', 'Comunicat de presă', t.press)}${block('social', 'mega', 'Postare social media', t.social)}${block('video', 'film', 'Script video 60 s', t.video)}`;
+}
+
+/* --- Raportări --- */
+function viewReports(){
+  const rs = [...state.reports].sort((a, b) => (a.status === 'nou' ? 0 : 1) - (b.status === 'nou' ? 0 : 1) || b.ts - a.ts);
+  return `<div class="hero"><h1>Raportări din teren</h1><p class="muted small">De la turiști, montaniarzi și localnici. Le validezi și devin cazuri, cu probele deja amprentate.</p></div>
+  ${rs.map(r => { const z = evalZone(r.lat, r.lng); const dup = state.cases.filter(c => c.loc && c.threat === r.threat && dist(c.loc, r) < 1.5);
+    return `<div class="card"><div class="row top"><div class="thumb"><img src="${r.thumb}" alt=""></div><div style="flex:1;min-width:0">
+      <div class="row" style="gap:6px;flex-wrap:wrap;margin-bottom:4px"><span class="pill" style="background:${THREATS[r.threat].color};color:#fff;border-color:transparent">${THREATS[r.threat].label.split(' / ')[0]}</span>${r.status === 'nou' ? '<span class="pill info">Nou</span>' : r.status === 'validat' ? '<span class="pill ok">În caz</span>' : '<span class="pill">Respins</span>'}</div>
+      <div class="small" style="font-weight:600;line-height:1.35">${esc(r.desc)}</div><div class="muted xs" style="margin-top:4px">${esc(r.reporter)} · ${ago(r.ts)} · ${esc(z.name)}</div><div class="hash" style="margin-top:2px">SHA-256 ${r.hash.slice(0, 24)}…</div></div></div>
+      ${dup.length && r.status === 'nou' ? `<div class="card flat warn small" style="margin:10px 0 0">Posibil legat de <b>${esc(dup[0].title)}</b> (${f1(dist(dup[0].loc, r))} km).</div>` : ''}
+      ${r.status === 'nou' ? `<div class="grid2" style="margin-top:10px">${dup.length ? `<button class="btn sm" data-act="attach" data-id="${r.id}" data-c="${dup[0].id}">Adaugă la caz</button>` : `<button class="btn sm" data-act="reject" data-id="${r.id}">Respinge</button>`}<button class="btn sm primary" data-act="validate" data-id="${r.id}">Deschide caz</button></div>`
+        : r.caseId ? `<button class="btn sm block" style="margin-top:10px" data-act="open" data-id="${r.caseId}">Vezi cazul</button>` : ''}</div>`; }).join('')}`;
+}
+
+/* --- Impact --- */
+function stackHTML(out){ const tot = Object.values(out).reduce((a, b) => a + b, 0) || 1; return `<div class="stack">${Object.entries(OUT).map(([k, v]) => out[k] ? `<i style="width:${out[k] / tot * 100}%;background:${v[2]}" title="${v[0]}"></i>` : '').join('')}</div><div class="legend" style="margin:0">${Object.entries(OUT).filter(([k]) => out[k]).map(([k, v]) => `<span><i style="background:${v[2]}"></i>${v[0]} · ${out[k]}</span>`).join('')}</div>`; }
+function donorBlock(cs, label){
+  const s = stats(cs), a = state.amount;
+  const items = COSTS.map(x => ({ ...x, n: a / x.lei })).filter(x => x.n >= .25).slice(0, 3);
+  return `<div class="public"><div class="head"><div class="xs" style="opacity:.85;font-weight:700;letter-spacing:.06em">${esc(label).toUpperCase()}</div>
+    <h2 style="margin:8px 0 14px">În ${s.stopped} locuri, distrugerea s-a oprit. Pentru celelalte, luptăm în instanță${s.maxAge > YEAR ? ` de până la ${fmtDur(s.maxAge)}` : ''}.</h2>
+    <div class="grid2"><div><div class="big">${f1(s.haProtected)}</div><div class="small" style="opacity:.9">hectare unde distrugerea s-a oprit</div></div><div><div class="big">${s.openJud}</div><div class="small" style="opacity:.9">procese și dosare penale în curs</div></div></div></div>
+    <div style="padding:14px"><p class="small" style="margin:0 0 4px"><b>Dosarele de mediu durează ani.</b> O donație lunară ține un dosar în viață până la capăt.</p>
+    <div class="amts">${[25, 50, 100, 200].map(v => `<button class="${a === v ? 'on' : ''}" data-act="amount" data-v="${v}">${v} lei</button>`).join('')}</div>
+    <div class="card flat" style="margin:0 0 10px;padding:10px 12px"><div class="xs muted b" style="margin-bottom:4px">${a} LEI PE LUNĂ, TIMP DE UN AN (${lei(a * 12)}), ACOPERĂ:</div>${COSTS.map(x => ({ ...x, n:a * 12 / x.lei })).filter(x => x.n >= .5).slice(0, 3).map(x => `<div class="small">≈ ${f1(x.n)} × ${x.label}</div>`).join('') || `<div class="small">o parte dintr-o ${COSTS[0].label}</div>`}<div class="muted xs" style="margin-top:4px">Costuri orientative, de completat de asociație.</div></div>
+    <button class="btn primary block" data-act="donate">${svg('heart')} Donează lunar</button></div></div>`;
+}
+function viewImpact(){
+  const seg = state.role === 'team' ? state.impactSeg : 'rezultate';
+  const segs = state.role === 'team' ? `<div class="seg s4">${[['rezultate','Rezultate'],['campanii','Campanii'],['institutii','Instituții'],['cifre','Cifre']].map(([k, l]) => `<button class="${seg === k ? 'on' : ''}" data-act="impact-seg" data-s="${k}">${l}</button>`).join('')}</div>` : '';
+  let body = '';
+  if (seg === 'rezultate') {
+    const s = stats();
+    body = `<div id="imap" class="mapbox" style="height:46vh"></div>
+    <div class="legend"><span><i style="background:#1f7a45;border-radius:50%"></i>Oprit pe teren</span><span><i style="background:#b42318;border-radius:50%"></i>Continuă</span><span><i style="background:#9bab9f;border-radius:50%"></i>Necunoscut</span>${state.role === 'team' ? '<span><i style="background:#1d5c8c;border-radius:50%"></i>Raportare</span>' : ''}</div>
+    <div class="clocks"><div class="clock"><div class="k">CEASUL DIN TEREN</div><div class="v">${s.stopped} din ${s.n}</div><div class="muted xs">amenințări oprite${s.median != null ? `, de regulă în ${zile(s.median)}` : ''}</div></div>
+      <div class="clock"><div class="k">CEASUL JURIDIC</div><div class="v">${fmtDur(s.avgAge)}</div><div class="muted xs">durata medie a proceselor în curs · cel mai vechi ${fmtDur(s.maxAge)}</div></div></div>
+    <div class="card"><h3>Rezultatul juridic, cu tot cu eșecuri</h3>${stackHTML(s.out)}<p class="muted xs" style="margin:8px 0 0">Clasările și prescripțiile rămân vizibile. Sunt și ele date: arată unde sistemul nu funcționează.</p></div>
+    ${state.role === 'team' ? `<button class="btn block" data-act="annual" style="margin-bottom:12px">${svg('doc')} Raportul anual (PDF)</button><div class="sec">Pagina publică pentru donatori</div>` : ''}
+    ${donorBlock(state.cases, 'Agent Green · ' + new Date().getFullYear())}`;
+  } else if (seg === 'campanii') {
+    if (state.campaign) {
+      const k = CAMPAIGNS.find(x => x.id === state.campaign), cs = state.cases.filter(c => c.camps.includes(k.id)), s = stats(cs), pts = state.partners.filter(p => p.camp === k.id);
+      body = `<button class="btn sm ghost" data-act="camp" data-k="">‹ Toate campaniile</button><h2 style="margin:10px 0 2px">${esc(k.name)}</h2><p class="muted xs"><a href="${k.url}" target="_blank" rel="noopener" style="color:inherit">${k.url.replace('https://', '')}</a></p>
+      <div class="grid3" style="margin-bottom:12px"><div class="tile"><div class="n">${cs.length}</div><div class="l">cazuri</div></div><div class="tile ok"><div class="n">${s.stopped}</div><div class="l">oprite pe teren</div></div><div class="tile info"><div class="n">${s.openJud}</div><div class="l">procese în curs</div></div></div>
+      <div class="card"><h3>Rezultat juridic</h3>${stackHTML(s.out)}</div>
+      <div class="sec">Ultimele vești (pentru pagina campaniei)</div>
+      <div class="card">${cs.flatMap(c => (c.procs || []).flatMap(p => p.events.filter(e => e.ts <= now()).map(e => ({ c, e })))).sort((a, b) => b.e.ts - a.e.ts).slice(0, 5).map(x => `<div class="ev"><div style="flex:1"><div class="small b">${EV[x.e.type].label}</div><div class="muted xs">${esc(x.c.title)} · ${fmtD(x.e.ts)}</div></div></div>`).join('') || '<p class="muted small" style="margin:0">Nimic încă.</p>'}</div>
+      <div class="sec">Parteneri ai campaniei</div>
+      <div class="card">${pts.map(p => `<div class="ev">${svg('handshake')}<div style="flex:1"><div class="small b">${esc(p.name)}</div><div class="muted xs">${esc(p.tier)}${p.eur ? ' · ' + p.eur.toLocaleString('ro-RO') + ' €' : ''} · din ${fmtMY(p.since)}</div></div><button class="btn sm" data-act="preport" data-id="${p.id}">Raport</button></div>`).join('') || '<p class="muted small" style="margin:0 0 8px">Niciun partener încă.</p>'}
+        <p class="muted xs" style="margin:8px 0 0">Raportul trimestrial se generează din cazurile campaniei, cu tot ce s-a întâmplat, inclusiv ce nu a mers.</p></div>
+      ${donorBlock(cs, k.name)}`;
+    } else {
+      body = `<p class="muted small">Campaniile Agent Green de pe agentgreen.ro. Fiecare caz e legat de una sau mai multe, iar pagina campaniei se actualizează singură.</p>
+      ${CAMPAIGNS.map(k => { const cs = state.cases.filter(c => c.camps.includes(k.id)), s = stats(cs); return `<button class="card" style="width:100%;text-align:left;cursor:pointer" data-act="camp" data-k="${k.id}"><div class="row"><div style="flex:1"><div class="b">${esc(k.name)}</div><div class="muted xs">${cs.length} cazuri · ${s.stopped} oprite pe teren · ${s.openJud} procese în curs${state.partners.some(p => p.camp === k.id) ? ' · are parteneri' : ''}</div></div><span class="muted">›</span></div>${cs.length ? stackHTML(s.out).split('<div class="legend"')[0] : ''}</button>`; }).join('')}`;
+    }
+  } else if (seg === 'institutii') {
+    const is = instStats();
+    body = `<p class="muted small">Cum răspund instituțiile la sesizări. Lentoarea devine argument: pentru presă, advocacy și plângerile la Comisia Europeană.</p>
+    <button class="btn primary block" data-act="inaction" style="margin-bottom:12px">${svg('doc')} Raport de inacțiune instituțională (PDF)</button>
+    ${is.insts.map(i => `<div class="card"><div class="row"><div style="flex:1"><div class="b">${esc(i.inst)}</div><div class="muted xs">${i.n} sesizări · mediana răspunsului ${i.median != null ? zile(i.median) : '—'}</div></div><span class="pill ${i.pctNever > .4 ? 'danger' : i.pctNever > .25 ? 'warn' : 'ok'}">${Math.round(i.pctNever * 100)}% fără răspuns</span></div>
+      <div class="stack"><i style="width:${i.inTerm / i.n * 100}%;background:#1f7a45"></i><i style="width:${i.late / i.n * 100}%;background:#e0a100"></i><i style="width:${i.never / i.n * 100}%;background:#b42318"></i><i style="width:${i.pending / i.n * 100}%;background:#9bab9f"></i></div>
+      <div class="legend" style="margin:0"><span><i style="background:#1f7a45"></i>În termen ${i.inTerm}</span><span><i style="background:#e0a100"></i>Târziu ${i.late}</span><span><i style="background:#b42318"></i>Niciodată ${i.never}</span>${i.pending ? `<span><i style="background:#9bab9f"></i>În termen încă ${i.pending}</span>` : ''}</div></div>`).join('')}
+    <div class="card"><div class="b">Parchete · plângeri penale</div><div class="muted xs" style="margin-bottom:6px">${is.par.n} dosare · durată medie ${f1(is.par.avgYears)} ani · cel mai lung interval fără mișcare: ${is.par.maxIdle} luni</div>
+      ${stackHTML({ castigat:0, rezolvat:0, procedura:is.par.urmarire, clasat:is.par.clasat, prescris:is.par.prescris, pierdut:0, fara:0, ...{} }).replace('În procedură', 'În urmărire penală')}<div class="muted xs" style="margin-top:4px">Trimise în judecată: ${is.par.judecata}</div></div>
+    <p class="muted xs">Date demonstrative (istoric sintetic + cazurile din aplicație).</p>`;
+  } else {
+    const s = stats(); const ids = f => state.cases.filter(f).map(c => c.id);
+    const nums = [
+      { v:s.investigations, l:'investigații documentate', def:'Cazuri cu cel puțin o probă amprentată pe teren.', ids:ids(c => c.evidence.length) },
+      { v:s.stopped, l:'amenințări oprite pe teren', def:'Activitatea a încetat, confirmat de echipă, cu dată.', ids:ids(c => c.field.status === 'oprit') },
+      { v:f1(s.haProtected), l:'hectare unde distrugerea s-a oprit', def:'Suprafața cazurilor oprite pe teren sau rezolvate. Nu include suprafețele aflate doar în proces.', ids:ids(c => c.field.status === 'oprit' || ['castigat','rezolvat'].includes(legalOutcome(c))) },
+      { v:s.wonCourt, l:'hotărâri definitive câștigate', def:'Proceduri judiciare încheiate definitiv în favoarea asociației.', ids:ids(c => (c.procs || []).some(p => p.events.some(e => e.type === 'definitiv' && e.win === true))) },
+      { v:s.openJud, l:'procese și dosare penale în curs', def:'Proceduri judiciare deschise, indiferent de vechime.', ids:ids(c => (c.procs || []).some(p => (p.kind === 'penal' || p.kind === 'contencios') && !isFinal(p))) },
+      { v:s.out.clasat + s.out.prescris, l:'dosare clasate sau prescrise', def:'Cazuri în care justiția nu a ajuns la o soluție pe fond. Le publicăm și pe acestea.', ids:ids(c => ['clasat','prescris'].includes(legalOutcome(c))) }
+    ];
+    body = `<div class="card flat warn small">Pe site-ul de azi, aceeași categorie apare cu cifre diferite pe pagini diferite (ex. investigații, hectare, procese). Aici, fiecare cifră are o singură definiție și lista de cazuri din spate. Toate paginile o preiau de aici.</div>
+    ${nums.map((n, i) => `<button class="card" style="width:100%;text-align:left;cursor:pointer" data-act="numcases" data-i="${i}"><div class="row"><div class="metric" style="min-width:64px">${n.v}</div><div style="flex:1"><div class="b small">${n.l}</div><div class="muted xs">${n.def}</div></div><span class="muted">›</span></div></button>`).join('')}`;
+    state._nums = nums;
+  }
+  return `<div class="hero"><h1>${state.role === 'team' ? 'Impact' : 'Harta naturii apărate'}</h1></div>${segs}${body}`;
+}
+
+/* --- Voluntar --- */
+function viewVReport(){
+  const d = state.vdraft || (state.vdraft = { threat:null, photo:null, loc:null, desc:'', reporter:state.myName });
+  return `<div class="hero"><h1>Ai văzut ceva care nu e în regulă?</h1><p class="muted small">Durează un minut. Poza și locația sunt securizate automat, iar echipa Agent Green verifică fiecare raportare.</p></div>
+  <div class="sec">1 · Ce ai văzut</div><div class="tgrid">${Object.entries(THREATS).filter(([k]) => k !== 'amenajament').map(([k, t]) => `<button class="tpick ${d.threat === k ? 'on' : ''}" data-act="vthreat" data-t="${k}">${tbadge(k)}<span>${t.label}</span></button>`).join('')}</div>
+  <div class="sec">2 · Fotografiază</div>
+  ${d.photo ? `<div class="card row"><div class="thumb"><img src="${d.photo.thumb}" alt=""></div><div style="flex:1;min-width:0"><div class="small" style="font-weight:600">${esc(d.photo.name)}</div><div class="hash">SHA-256 ${d.photo.hash.slice(0, 24)}…</div></div></div>` : ''}
+  <label class="btn ${d.photo ? '' : 'primary'} block">${svg('camera')} ${d.photo ? 'Altă poză' : 'Fă o poză'}<input type="file" accept="image/*" capture="environment" hidden data-change="vphoto"></label>
+  <div class="sec">3 · Unde</div>
+  <div class="card row"><div style="flex:1" class="small">${d.loc ? `<b>${esc(evalZone(d.loc.lat, d.loc.lng).name)}</b><div class="muted xs">${fx(d.loc.lat)}, ${fx(d.loc.lng)}</div>` : '<span class="muted">Locație nepreluată</span>'}</div>
+    <div style="display:flex;flex-direction:column;gap:6px"><button class="btn sm" data-act="vgps">Locația mea</button><button class="btn sm ghost" data-act="vdemo">Simulează</button></div></div>
+  <div class="sec">4 · Detalii</div>
+  <textarea class="in" data-vfield="desc" placeholder="Ce ai observat? Ex.: drujbe, capcane, utilaje în râu…">${esc(d.desc)}</textarea>
+  <input class="in" data-vfield="reporter" value="${esc(d.reporter)}" placeholder="Numele tău (opțional)" style="margin-top:8px">
+  <button class="btn primary block" style="margin-top:14px;padding:15px" data-act="vsend" ${d.threat && (d.photo || d.desc) && d.loc ? '' : 'disabled'}>Trimite raportarea</button>
+  <p class="muted xs" style="margin-top:8px">Datele tale nu sunt publicate. Le vede doar echipa Agent Green.</p>`;
+}
+function viewVMine(){
+  const mine = state.reports.filter(r => r.mine).sort((a, b) => b.ts - a.ts);
+  return `<div class="hero"><h1>Raportările mele</h1><p class="muted small">Vezi ce s-a întâmplat cu fiecare. Unele cazuri durează ani: aici le poți urmări.</p></div>
+  ${mine.length ? mine.map(r => { const c = r.caseId && state.cases.find(x => x.id === r.caseId);
+    return `<div class="card"><div class="row top"><div class="thumb"><img src="${r.thumb}" alt=""></div><div style="flex:1;min-width:0"><div class="small" style="font-weight:600">${esc(r.desc || THREATS[r.threat].label)}</div><div class="muted xs">${ago(r.ts)}</div>
+      <div style="margin-top:6px">${r.status === 'nou' ? '<span class="pill info">În verificare</span>' : r.status === 'validat' ? `<span class="pill ok">A devenit caz${c ? ' · ' + c.code : ''}</span>` : '<span class="pill">Nu a putut fi confirmată</span>'}</div>
+      ${c ? `<div class="muted xs" style="margin-top:6px">Pe teren: ${FIELD[c.field.status][0].toLowerCase()} · ${OUT[legalOutcome(c)][0].toLowerCase()}</div>` : ''}</div></div></div>`; }).join('')
+  : `<div class="card flat"><p class="small muted" style="margin:0 0 10px">Nu ai trimis încă nicio raportare.</p><button class="btn primary block" data-act="view" data-v="vreport">Raportează acum</button></div>`}`;
+}
+
+/* ---------- Hărți ---------- */
+function baseLayers(m){
+  const sat = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { maxZoom:19, attribution:'Esri World Imagery' }).addTo(m);
+  const osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom:19, attribution:'© OpenStreetMap' });
+  let zones;
+  if (CUSTOM) {
+    const b = m.getBounds().pad(1.5), lay = [];
+    CUSTOM.zones.filter(z => b.intersects(L.latLngBounds([z.bbox[0], z.bbox[1]], [z.bbox[2], z.bbox[3]]))).slice(0, 600).forEach(z => z.rings.forEach(r => lay.push(L.polygon(r, { color: z.level === 'strict' ? '#d92d20' : '#e0a100', weight:1.5, fillOpacity: z.level === 'strict' ? .2 : .05 }).bindTooltip(z.name))));
+    zones = L.layerGroup(lay).addTo(m);
+  } else zones = L.layerGroup(DEMO_ZONES.map(z => L.polygon(z.poly, { color:z.color, weight:2, fillOpacity: z.level === 'strict' ? .22 : .06, dashArray: z.level === 'park' ? '6 4' : null }).bindTooltip(z.name))).addTo(m);
+  return { sat, osm, zones };
+}
+function after(){
+  if (!window.L) return;
+  const c = cur();
+  if (state.view === 'case' && state.step === 1 && $('#zmap')) {
+    const m = L.map('zmap', { preferCanvas:true }).setView(c.loc ? [c.loc.lat, c.loc.lng] : [45.365, 22.84], c.loc ? 12 : 11); maps.push(m);
+    const b = baseLayers(m); L.control.layers({ 'Satelit':b.sat, 'Hartă':b.osm }, null, { position:'topright' }).addTo(m);
+    c.evidence.filter(e => e.lat != null).forEach(e => L.circleMarker([e.lat, e.lng], { radius:5, color:'#fff', weight:1.5, fillColor:'#2f9a5c', fillOpacity:1 }).bindTooltip(e.name).addTo(m));
+    if (c.loc) L.circleMarker([c.loc.lat, c.loc.lng], { radius:9, color:'#fff', weight:3, fillColor:THREATS[c.threat].color, fillOpacity:1 }).addTo(m);
+    m.on('click', ev => setLoc(c, ev.latlng.lat, ev.latlng.lng, 0, 'Punct ales pe hartă'));
+  }
+  if (state.view === 'impact' && $('#imap')) {
+    const m = L.map('imap', { preferCanvas:true }).setView([45.37, 22.84], 11); maps.push(m);
+    const b = baseLayers(m), cl = { oprit:'#1f7a45', activ:'#b42318', necunoscut:'#9bab9f' };
+    const lc = L.layerGroup(), lr = L.layerGroup();
+    state.cases.filter(x => x.loc).forEach(x => L.circleMarker([x.loc.lat, x.loc.lng], { radius:9, color:'#fff', weight:2.5, fillColor:cl[x.field.status], fillOpacity:1 })
+      .bindPopup(`<b>${esc(x.title)}</b><br>Pe teren: ${FIELD[x.field.status][0]}${fieldDays(x) != null ? ` (după ${zile(fieldDays(x))})` : ''}<br>Juridic: ${OUT[legalOutcome(x)][0]}${legalAge(x) > 30 * DAY ? ` · ${fmtDur(legalAge(x))}` : ''}`).addTo(lc));
+    state.reports.filter(r => r.status === 'nou').forEach(r => L.circleMarker([r.lat, r.lng], { radius:6, color:'#fff', weight:2, fillColor:'#1d5c8c', fillOpacity:1 }).bindPopup(`<b>Raportare</b><br>${esc(r.desc)}`).addTo(lr));
+    lc.addTo(m); if (state.role === 'team') lr.addTo(m);
+    const ov = { 'Arii protejate':b.zones, 'Cazuri':lc }; if (state.role === 'team') ov['Raportări noi'] = lr;
+    L.control.layers({ 'Satelit':b.sat, 'Hartă':b.osm }, ov, { position:'topright' }).addTo(m);
+  }
+  if (state.view === 'case' && c && c.loc && (state.step === 4 || state.step === 5)) {
+    fingerprint(c).then(fp => { state.fingerprint = fp; const el = $('#fp'); if (el) el.textContent = fp; const d = $('#docprev'); if (d) d.innerHTML = docHTML(c, state.docType, fp);
+      const ld = state.legalDoc, lp = $('#ldprev'); if (lp && ld) { const p = c.procs.find(x => x.id === ld.p); lp.innerHTML = legalDocHTML(c, ld.kind, p, p.events.find(e => e.id === ld.e), fp); } });
+  }
+}
+
+/* ---------- Acțiuni ---------- */
+function markDone(c, i){ if (!c.done.includes(i)) c.done.push(i); }
+function setLoc(c, lat, lng, acc, source){ c.loc = { lat, lng, acc, source }; c.zone = evalZone(lat, lng); if (!c.camps.length) c.camps = THREATS[c.threat].camps(c.zone); addLog(c, `Zonă verificată (${source}): ${c.zone.name}`); markDone(c, 1); persist(); render(); }
+function getFix(){ return new Promise((res, rej) => { if (!navigator.geolocation) return rej(new Error('GPS indisponibil')); navigator.geolocation.getCurrentPosition(p => res({ lat:p.coords.latitude, lng:p.coords.longitude, acc:p.coords.accuracy, ts:now() }), rej, { enableHighAccuracy:true, timeout:12000, maximumAge:15000 }); }); }
+function makeThumb(file){ return new Promise((res, rej) => { const url = URL.createObjectURL(file), img = new Image(); img.onload = () => { const s = 160, cv = document.createElement('canvas'), r = Math.max(s / img.width, s / img.height); cv.width = s; cv.height = s; const w = img.width * r, h = img.height * r; cv.getContext('2d').drawImage(img, (s - w) / 2, (s - h) / 2, w, h); URL.revokeObjectURL(url); res(cv.toDataURL('image/jpeg', .7)); }; img.onerror = () => { URL.revokeObjectURL(url); rej(); }; img.src = url; }); }
+async function hashFile(f){ const hash = await sha256(await f.arrayBuffer()); const thumb = f.type.startsWith('image/') ? await makeThumb(f).catch(() => '') : ''; return { name: f.name || ('IMG_' + now() + '.jpg'), type: f.type.startsWith('video/') ? 'video' : 'image', size:f.size, ts:now(), hash, thumb }; }
+async function capture(files){
+  const c = cur(); if (!c || !files.length) return; toast('Se calculează amprentele…');
+  if (!state.lastFix) { try { state.lastFix = await getFix(); } catch (e) {} }
+  for (const f of files) { const e = await hashFile(f), fix = state.lastFix; Object.assign(e, { lat: fix ? fix.lat : null, lng: fix ? fix.lng : null, acc: fix ? fix.acc : null }); c.evidence.push(e); addLog(c, `Probă capturată ${e.name} · SHA-256 ${e.hash.slice(0, 12)}…${fix ? '' : ' · fără GPS'}`); }
+  markDone(c, 0); persist(); render(); toast(`${files.length} ${files.length === 1 ? 'probă înregistrată' : 'probe înregistrate'}`);
+}
+function openCase(id, step){ state.current = id; state.view = 'case'; state.legalDoc = null; state.docType = null; const c = cur(); state.step = step != null ? step : Math.min(c.done.length ? Math.max(...c.done) + 1 : 0, 6); render(); }
+function procFor(c, kind, authority){ let p = c.procs.find(x => x.kind === kind && x.authority === authority && !isFinal(x)); if (!p) { p = { id:'p' + uid(), kind, authority, number:'', events:[] }; c.procs.push(p); } return p; }
+function reportToCase(r){
+  const z = evalZone(r.lat, r.lng);
+  const c = newCase(r.threat, (THREATS[r.threat].label + ' — ' + (z.level === 'none' ? 'raportare voluntar' : z.name.replace('Zona de protecție strictă ', '').replace(' – protecție strictă', ''))).slice(0, 90));
+  c.source = 'voluntar'; c.reporter = r.reporter; c.notes = r.desc; c.dateFapta = r.ts;
+  c.evidence.push({ name: r.name || `RAPORTARE_${r.id.slice(-5)}.jpg`, type:'image', size:r.size || 0, ts:r.ts, lat:r.lat, lng:r.lng, acc:r.acc || 10, hash:r.hash, thumb:r.thumb, demo:r.demo });
+  c.loc = { lat:r.lat, lng:r.lng, acc:r.acc || 10, source:'GPS raportare voluntar' }; c.zone = z; c.camps = THREATS[r.threat].camps(z);
+  addLog(c, `Raportare primită de la ${r.reporter} · SHA-256 ${r.hash.slice(0, 12)}…`, r.ts); addLog(c, 'Raportare validată de echipă, caz deschis'); addLog(c, `Zonă verificată: ${z.name}`);
+  c.done = [0, 1]; state.cases.push(c); r.status = 'validat'; r.caseId = c.id; return c;
+}
+
+document.addEventListener('click', async ev => {
+  const t = ev.target.closest('[data-act]'); if (!t) return;
+  const a = t.dataset.act, c = cur();
+  switch (a) {
+    case 'role': state.role = t.dataset.r; state.view = state.role === 'team' ? 'home' : 'vreport'; persist(); render(); break;
+    case 'view': state.view = t.dataset.v; if (t.dataset.v === 'cases') state.subset = null; render(); break;
+    case 'seg-cases': state.view = 'cases'; state.seg = t.dataset.s; state.subset = null; render(); break;
+    case 'seg': state.seg = t.dataset.s; render(); break;
+    case 'filter': state.filter = t.dataset.f; render(); break;
+    case 'clear-subset': state.subset = null; render(); break;
+    case 'impact-seg': state.view = 'impact'; state.impactSeg = t.dataset.s; state.campaign = null; render(); break;
+    case 'camp': state.campaign = t.dataset.k || null; render(); break;
+    case 'amount': state.amount = +t.dataset.v; render(); break;
+    case 'numcases': { const n = state._nums[+t.dataset.i]; state.subset = { label:n.l.charAt(0).toUpperCase() + n.l.slice(1), ids:n.ids }; state.seg = 'all'; state.filter = 'all'; state.view = 'cases'; render(); break; }
+    case 'create': { const nc = newCase(t.dataset.t); addLog(nc, 'Caz deschis'); state.cases.push(nc); persist(); openCase(nc.id, 0); break; }
+    case 'open': openCase(t.dataset.id, t.dataset.step ? +t.dataset.step : null); break;
+    case 'step': state.step = +t.dataset.i; state.legalDoc = null; render(); break;
+    case 'prev': state.step = Math.max(0, state.step - 1); state.legalDoc = null; render(); break;
+    case 'next':
+      if (state.step === 0 && (c.evidence.length || c.notes)) markDone(c, 0);
+      if (state.step === 2 && c.loc) { markDone(c, 2); addLog(c, 'Analiză atașată la dosar'); }
+      if (state.step === 3 && c.loc) { markDone(c, 3); addLog(c, 'Verificări efectuate' + (c.manualCheck ? ' (inclusiv manual)' : '')); }
+      if (state.step === 5 && c.procs.length) markDone(c, 5);
+      state.step = Math.min(6, state.step + 1); state.legalDoc = null; persist(); render(); break;
+    case 'gps': try { state.lastFix = await getFix(); addLog(c, `Fix GPS ±${Math.round(state.lastFix.acc)} m`); persist(); render(); toast('GPS activ'); } catch (e) { toast('Nu am primit locația. Verifică permisiunea GPS.'); } break;
+    case 'loc-gps': try { const f = await getFix(); state.lastFix = f; setLoc(c, f.lat, f.lng, f.acc, 'GPS dispozitiv'); } catch (e) { toast('Nu am primit locația. Folosește simularea.'); } break;
+    case 'loc-ev': { const p = c.evidence.filter(e => e.lat != null); setLoc(c, p.reduce((s, e) => s + e.lat, 0) / p.length, p.reduce((s, e) => s + e.lng, 0) / p.length, Math.min(...p.map(e => e.acc || 10)), 'GPS probe'); break; }
+    case 'loc-demo': setLoc(c, DEMO_POINT.lat + (Math.random() - .5) * .01, DEMO_POINT.lng + (Math.random() - .5) * .01, 8, 'Punct simulat (demo)'); break;
+    case 'tagcamp': { const k = t.dataset.k; c.camps = c.camps.includes(k) ? c.camps.filter(x => x !== k) : [...c.camps, k]; persist(); render(); break; }
+    case 'doctype': state.docType = t.dataset.k; render(); break;
+    case 'print': { const fp = state.fingerprint || await fingerprint(c); printHTML(docHTML(c, state.docType, fp)); markDone(c, 4); addLog(c, `Document generat: ${RECIP[state.docType].label} – ${RECIP[state.docType].sub}`); persist(); break; }
+    case 'copydoc': copyText($('#docprev').innerText); break;
+    case 'manifest': {
+      const fp = state.fingerprint || await fingerprint(c);
+      const m = { generator:'Agent Green – platforma de teren (concept demo)', case:c.code, title:c.title, threat:THREATS[c.threat].label, campaigns:c.camps.map(campName), fingerprint_sha256:fp, location:c.loc, zone:c.zone, field:c.field,
+        evidence:c.evidence.map(e => ({ file:e.name, captured:new Date(e.ts).toISOString(), gps: e.lat != null ? { lat:e.lat, lng:e.lng, accuracy_m:e.acc } : null, sha256:e.hash })),
+        procedures:c.procs.map(p => ({ kind:PROC_KIND[p.kind], authority:p.authority, number:p.number, events:sortedEv(p).map(e => ({ at:new Date(e.ts).toISOString(), event:EV[e.type].label, reg_no:e.regNo || null, note:e.note || null, favourable: e.win ?? null })) })),
+        custody_log:[...c.log].sort((x, y) => x.ts - y.ts).map(l => ({ at:new Date(l.ts).toISOString(), event:l.msg })) };
+      download(`${c.code}-manifest.json`, JSON.stringify(m, null, 2), 'application/json'); addLog(c, 'Manifest exportat'); persist(); toast('Manifest exportat'); break;
+    }
+    case 'file': {
+      const rk = state.docType, no = ($('#regno').value || '').trim() || String(1000 + Math.floor(Math.random() * 8999));
+      const kind = rk === 'penal' ? 'penal' : rk === 'ec' ? 'ce' : 'admin', auth = rk === 'penal' ? 'Parchet' : rk === 'ec' ? 'Comisia Europeană' : rk === 'info544' ? (c.threat === 'amenajament' ? 'Ministerul Mediului' : 'Autoritatea competentă') : RECIP[rk].sub;
+      const type = rk === 'penal' ? 'plangere_penala' : rk === 'ec' ? 'plangere_ce' : rk === 'info544' ? 'cerere544' : 'sesizare';
+      const p = procFor(c, kind, auth); if (!p.number && (kind === 'penal' || kind === 'ce')) p.number = no;
+      p.events.push({ id:'e' + uid(), type, ts:now(), regNo:no, rk });
+      addLog(c, `${PROC_KIND[kind]} · ${auth}: ${EV[type].label}, nr. ${no}`); markDone(c, 4); persist(); toast('Depus. Termenele sunt urmărite automat.'); state.step = 5; render(); break;
+    }
+    case 'rec': {
+      const ra = t.dataset.a;
+      if (ra === 'ldoc') { state.legalDoc = { kind:t.dataset.kind, p:t.dataset.p, e:t.dataset.e }; render(); setTimeout(() => { const b = $('#ldocbox'); if (b) b.scrollIntoView({ behavior:'smooth', block:'start' }); }, 80); }
+      else if (ra === 'goto') { state.step = +t.dataset.step; render(); }
+      break;
+    }
+    case 'ldoc-close': state.legalDoc = null; render(); break;
+    case 'ldoc-print': { const ld = state.legalDoc, p = c.procs.find(x => x.id === ld.p); printHTML(legalDocHTML(c, ld.kind, p, p.events.find(e => e.id === ld.e), state.fingerprint || await fingerprint(c))); break; }
+    case 'ldoc-copy': copyText($('#ldprev').innerText); break;
+    case 'ldoc-file': {
+      const ld = state.legalDoc, p = c.procs.find(x => x.id === ld.p), no = ($('#ldno').value || '').trim() || String(1000 + Math.floor(Math.random() * 8999)), type = LDOC[ld.kind].evt;
+      let target = p; if (type === 'plangere_prealabila' && p.kind === 'admin') { target = p; }
+      target.events.push({ id:'e' + uid(), type, ts:now(), regNo:no });
+      addLog(c, `${PROC_KIND[target.kind]} · ${target.authority}: ${EV[type].label}, nr. ${no}`); state.legalDoc = null; persist(); toast('Depus. Termenul următor e urmărit.'); render(); break;
+    }
+    case 'addev': {
+      const p = c.procs.find(x => x.id === t.dataset.p), type = $('#evt-' + p.id).value, ts = fromDateInput($('#evd-' + p.id).value), w = $('#evw-' + p.id).value, note = ($('#evn-' + p.id).value || '').trim();
+      p.events.push({ id:'e' + uid(), type, ts, note, win: w === '' ? null : w === '1' });
+      addLog(c, `${PROC_KIND[p.kind]} · ${p.authority}: ${EV[type].label}${note ? ' — ' + note : ''} (data ${fmtDs(ts)})`); persist();
+      const r = RULES[type]; toast(r && r.ours ? `Termen pornit: ${r.label.toLowerCase()} (${r.days} zile)` : 'Pas adăugat'); render(); break;
+    }
+    case 'handover': { const n = ($('#newowner').value || '').trim(); if (!n) { toast('Scrie numele persoanei'); break; } addLog(c, `Caz predat de ${c.legal.owner} către ${n}`); c.legal.owners = [...(c.legal.owners || []), { name:n, from:now() }]; c.legal.owner = n; persist(); toast('Caz predat, cu tot istoricul'); render(); break; }
+    case 'copycamp': copyText(campaignTexts(c)[t.dataset.k]); break;
+    case 'publish': c.campaign.published = true; c.campaign.signatures = c.campaign.signatures || 1; addLog(c, 'Petiție publicată'); markDone(c, 6); persist(); render(); break;
+    case 'sign': c.campaign.signatures += 1; persist(); render(); break;
+    case 'alert': { const n = 12 + Math.round(seeded(c.loc.lat, c.loc.lng) * 140); addLog(c, `Alertă trimisă către ${n} voluntari din 20 km (demo)`); markDone(c, 6); persist(); toast(`Alertă trimisă către ${n} voluntari (demo)`); break; }
+    case 'validate': { const r = state.reports.find(x => x.id === t.dataset.id); const nc = reportToCase(r); persist(); toast('Caz deschis din raportare'); openCase(nc.id, 1); break; }
+    case 'attach': { const r = state.reports.find(x => x.id === t.dataset.id), tc = state.cases.find(x => x.id === t.dataset.c);
+      tc.evidence.push({ name:`RAPORTARE_${r.id.slice(-5)}.jpg`, type:'image', size:r.size || 0, ts:r.ts, lat:r.lat, lng:r.lng, acc:r.acc || 10, hash:r.hash, thumb:r.thumb, demo:r.demo });
+      addLog(tc, `Probă nouă din raportarea lui ${r.reporter} · SHA-256 ${r.hash.slice(0, 12)}…`); r.status = 'validat'; r.caseId = tc.id; persist(); toast('Adăugată la caz'); render(); break; }
+    case 'reject': { const r = state.reports.find(x => x.id === t.dataset.id); r.status = 'respins'; persist(); render(); break; }
+    case 'annual': printHTML(annualHTML()); break;
+    case 'inaction': printHTML(inactionHTML()); break;
+    case 'preport': printHTML(partnerReportHTML(state.partners.find(p => p.id === t.dataset.id))); break;
+    case 'donate': toast('În produs: agentgreen.ro/doneaza, cu donație lunară'); break;
+    case 'reset': if (confirm('Resetezi datele demo? Cazurile create de tine se pierd.')) { try { localStorage.removeItem(STORE); } catch (e) {} const d = await buildDemo(); Object.assign(state, { cases:d.cases, reports:d.reports, partners:d.partners }); persist(); render(); toast('Date demo resetate'); } break;
+    case 'vthreat': state.vdraft.threat = t.dataset.t; render(); break;
+    case 'vgps': try { const f = await getFix(); state.vdraft.loc = { lat:f.lat, lng:f.lng, acc:f.acc }; render(); } catch (e) { toast('Nu am primit locația. Folosește simularea.'); } break;
+    case 'vdemo': state.vdraft.loc = { lat:45.35 + (Math.random() - .5) * .06, lng:22.84 + (Math.random() - .5) * .12, acc:15 }; render(); break;
+    case 'vsend': { const d = state.vdraft;
+      state.reports.push({ id:'r' + uid(), threat:d.threat, desc:d.desc || THREATS[d.threat].label, reporter:d.reporter || 'anonim', lat:d.loc.lat, lng:d.loc.lng, acc:d.loc.acc, ts:now(), status:'nou', caseId:null,
+        thumb: d.photo ? d.photo.thumb : sceneSVG(d.threat, .5), hash: d.photo ? d.photo.hash : await sha256(d.desc + now()), name: d.photo ? d.photo.name : null, size: d.photo ? d.photo.size : 0, mine:true });
+      state.vdraft = null; persist(); toast('Mulțumim! Echipa a primit raportarea.'); state.view = 'vmine'; render(); break; }
+  }
+});
+document.addEventListener('change', async ev => {
+  const t = ev.target;
+  if (t.dataset.change === 'capture') { capture([...t.files]); t.value = ''; return; }
+  if (t.dataset.change === 'vphoto') { const f = t.files[0]; if (!f) return; toast('Se securizează poza…'); state.vdraft.photo = await hashFile(f); if (!state.vdraft.loc) { try { const x = await getFix(); state.vdraft.loc = { lat:x.lat, lng:x.lng, acc:x.acc }; } catch (e) {} } render(); return; }
+  if (t.dataset.change === 'bounds') { const f = t.files[0]; if (!f) return; toast('Se încarcă limitele…'); try { const n = await importBoundaries(f); state.cases.forEach(c => { if (c.loc) c.zone = evalZone(c.loc.lat, c.loc.lng); }); render(); toast(`${n} arii încărcate`); } catch (e) { toast(e.message || 'Fișierul nu a putut fi citit'); } t.value = ''; return; }
+  const c = cur(); if (!c) return;
+  const f = t.dataset.field;
+  if (f === 'manualCheck') { c.manualCheck = t.checked; addLog(c, t.checked ? 'Verificare manuală confirmată' : 'Verificare manuală anulată'); persist(); }
+  if (f === 'finding') { c.finding = t.value; persist(); }
+  if (f === 'dateFapta') { c.dateFapta = fromDateInput(t.value); persist(); }
+  if (f === 'fieldStatus') { c.field.status = t.value; if (t.value === 'oprit' && !c.field.at) c.field.at = now(); addLog(c, `Ceasul din teren: ${FIELD[t.value][0].toLowerCase()}`); persist(); render(); }
+  if (f === 'fieldAt') { c.field.at = fromDateInput(t.value); persist(); render(); }
+  if (f === 'penalty') { c.legal.penalty = t.value; persist(); render(); }
+});
+document.addEventListener('input', ev => {
+  const t = ev.target;
+  if (t.dataset.input === 'ba') { const v = +t.value, a = $('#baafter'), d = $('#badiv'); if (a) a.style.clipPath = `inset(0 0 0 ${v}%)`; if (d) d.style.left = v + '%'; return; }
+  if (t.dataset.vfield) { state.vdraft[t.dataset.vfield] = t.value; const b = $('[data-act="vsend"]'), d = state.vdraft; if (b) b.disabled = !(d.threat && (d.photo || d.desc) && d.loc); return; }
+  const c = cur(); if (!c) return;
+  if (t.dataset.q) { c.q[t.dataset.q] = t.value; const T = THREATS[c.threat], box = $('#estbox'); if (box && T.estimate) box.innerHTML = estHTML(T.estimate(c), T); persist(); return; }
+  const f = t.dataset.field; if (f === 'title' || f === 'notes' || f === 'ha') { c[f] = t.value; persist(); }
+});
+
+/* ---------- Ecran de bun venit (demo) ---------- */
+const INTRO_KEY = 'agdemo.intro.v1';
+function showIntro(on){ const el = $('#intro'); if (el) el.classList.toggle('on', on); }
+document.addEventListener('click', ev => { const t = ev.target.closest('[data-intro]'); if (!t) return;
+  if (t.dataset.intro === 'open') showIntro(true);
+  else { showIntro(false); try { localStorage.setItem(INTRO_KEY, '1'); } catch (e) {} } });
+(function(){ let seen = false; try { seen = localStorage.getItem(INTRO_KEY) === '1'; } catch (e) {} if (!seen) showIntro(true); })();
+
+/* ---------- Pornire ---------- */
+(async function init(){
+  state.history = buildHistory();
+  const saved = load();
+  if (saved && saved.cases && saved.cases.length) { state.cases = saved.cases; state.reports = saved.reports || []; state.partners = saved.partners || []; state.role = saved.role || 'team'; }
+  else { const d = await buildDemo(); state.cases = d.cases; state.reports = d.reports; state.partners = d.partners; }
+  state.view = state.role === 'team' ? 'home' : 'vreport';
+  persist(); render();
+})();
+</script>
+</body>
+</html>
